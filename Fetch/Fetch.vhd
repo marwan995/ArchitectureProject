@@ -10,6 +10,7 @@ ENTITY Fetch IS
         callRtiFlag : IN STD_LOGIC;
         memoryPcFlag : IN STD_LOGIC;
         jumpPcFlag : IN STD_LOGIC;
+        immedateFlag : OUT STD_LOGIC;
 
         instructionIn : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         instructionOut : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -56,22 +57,36 @@ ARCHITECTURE ArchFetch OF Fetch IS
             q, qbar : OUT STD_LOGIC
         );
     END COMPONENT TFlipFlop;
+    COMPONENT FullAdder IS
+        GENERIC (n : INTEGER := 8);
+        PORT (
+            in1, in2 : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+            carryIn : IN STD_LOGIC;
+            sum : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+            carryOut : OUT STD_LOGIC);
+    END COMPONENT FullAdder;
 
     SIGNAL instruction : STD_LOGIC_VECTOR(15 DOWNTO 0);
+    SIGNAL InstructionMuxOut : STD_LOGIC_VECTOR(15 DOWNTO 0);
+
     SIGNAL pcRegOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL pcRegIn : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL jmpMuxOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL pcMuxOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL updatedPc : STD_LOGIC_VECTOR(31 DOWNTO 0);
 BEGIN
     ImmidateValue : Mux2 PORT MAP(
         instruction, (OTHERS => '0'), freeze, immedateOut
     );
     InstructionFreeze : Mux2 PORT MAP(
-        instruction, instructionIn, freeze, instructionOut
+        instruction, instructionIn, freeze, instructionMuxOut
     );
-    -- ImmidateFlag :TFlipFlop port Map(
 
-    -- );
+    instructionOut <= instructionMuxOut;
+
+    ImmidateFlag : TFlipFlop PORT MAP(
+        instructionMuxOut(0), rst, '0', clk, immedateFlag, OPEN
+    );
     FetchInstruction : instructionMemory PORT MAP(
         clk, '0', pcRegOut(11 DOWNTO 0), ((OTHERS => '0')),
         instruction
@@ -81,16 +96,21 @@ BEGIN
         32) PORT MAP(
         clk, rst, pcRegIn, pcRegOut
     );
+
     pcOut <= pcRegOut;
+    incrementPc : FullAdder GENERIC MAP(
+        32) PORT MAP (
+        pcRegOut, (OTHERS => '0'), '1', updatedPc, OPEN
+    );
     MemoryJump : Mux2 PORT MAP(
-        jmpMuxOut, memoryPc, memoryPcFlag, instructionOut
+        jmpMuxOut, memoryPc, memoryPcFlag, pcRegIn
     );
 
     Branch : Mux2 PORT MAP(
         pcMuxOut, jumpPc, jumpPcFlag, jmpMuxOut
     );
-    --error update the pc
+
     stackJump : Mux2 PORT MAP(
-        pcRegOut, stackPc, callRtiFlag, pcMuxOut
+        updatedPc, stackPc, callRtiFlag, pcMuxOut
     );
 END ARCHITECTURE;

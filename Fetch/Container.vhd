@@ -48,21 +48,19 @@ BEGIN
 
     PROCESS (clk, rst)
     BEGIN
-        IF rst = '1' THEN
-            pcSig <= (OTHERS => '0');
-        ELSIF rising_edge(clk) THEN
+        IF falling_edge(clk) THEN
+            pcSig(11 DOWNTO 0) <= addr;
+            memCom <= data;
+        END IF;
+
+        IF rising_edge(clk) THEN
             IF wr = '1' THEN
                 w_r <= '1';
-                pcSig(11 DOWNTO 0) <= addr;
-                memCom <= data;
-                output <= (OTHERS => '0');
-
             ELSE
-                pcSig(11 DOWNTO 0) <= addr;
                 w_r <= '0';
-                output <= memOut;
             END IF;
         END IF;
 
+        output <= memOut;
     END PROCESS;
 END ARCHITECTURE;

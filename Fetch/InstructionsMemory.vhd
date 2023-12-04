@@ -10,15 +10,16 @@ ENTITY instructionMemory IS
         dataout : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
 END ENTITY instructionMemory;
 
-ARCHITECTURE Arch_instructionMemory OF instructionMemory IS TYPE instructionMemory_type 
-IS ARRAY(0 TO 4096) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
+ARCHITECTURE Arch_instructionMemory OF instructionMemory IS TYPE instructionMemory_type
+    IS ARRAY(0 TO 4096) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL instructionMemory : instructionMemory_type;
 BEGIN
     PROCESS (clk) IS
     BEGIN
-        IF rising_edge(clk) THEN
+        IF falling_edge(clk) THEN
             IF w_r = '1' THEN
                 instructionMemory(to_integer(unsigned((address)))) <= datain;
+                dataout <= datain;
             END IF;
         END IF;
     END PROCESS;

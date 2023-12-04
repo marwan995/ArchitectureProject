@@ -34,11 +34,10 @@ ARCHITECTURE ArchContainer OF Container IS
     END COMPONENT;
     SIGNAL pcSig : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL pcOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL w_r : STD_LOGIC;
     SIGNAL memOut, memCom : STD_LOGIC_VECTOR(15 DOWNTO 0);
 BEGIN
     LabelA : instructionMemory PORT MAP(
-        clk, w_r, pcOut(11 DOWNTO 0), memCom,
+        clk, wr, pcOut(11 DOWNTO 0), memCom,
         memOut
     );
     LabelB : REG GENERIC MAP(
@@ -46,21 +45,7 @@ BEGIN
         clk, rst, pcSig, pcOut
     );
 
-    PROCESS (clk, rst)
-    BEGIN
-        IF falling_edge(clk) THEN
-            pcSig(11 DOWNTO 0) <= addr;
-            memCom <= data;
-        END IF;
-
-        IF rising_edge(clk) THEN
-            IF wr = '1' THEN
-                w_r <= '1';
-            ELSE
-                w_r <= '0';
-            END IF;
-        END IF;
-
+    pcSig(11 DOWNTO 0) <= addr;
+    memCom <= data;
         output <= memOut;
-    END PROCESS;
 END ARCHITECTURE;

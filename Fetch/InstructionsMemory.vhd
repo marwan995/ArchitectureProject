@@ -16,10 +16,9 @@ ARCHITECTURE Arch_instructionMemory OF instructionMemory IS TYPE instructionMemo
 BEGIN
     PROCESS (clk) IS
     BEGIN
-        IF falling_edge(clk) THEN
+        IF rising_edge(clk) THEN
             IF w_r = '1' THEN
                 instructionMemory(to_integer(unsigned((address)))) <= datain;
-                dataout <= datain;
             END IF;
         END IF;
     END PROCESS;

@@ -19,8 +19,9 @@ BEGIN
     BEGIN
         IF rst = '1' THEN
             reg <= (OTHERS => '0');
-        ELSIF rising_edge(clk) THEN
+        ELSIF falling_edge(clk) then
             reg <= inData;
+
         END IF;
     END PROCESS;
 

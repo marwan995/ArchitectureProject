@@ -1,19 +1,21 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
-entity Mux2 is
-    port (
-        a : in std_logic;
-        b : in std_logic;
-        selector: in std_logic;
-        output:out std_logic
+ENTITY Mux2 IS
+    GENERIC (n : INTEGER := 1);
+    PORT (
+        a : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+        b : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+        selector : IN STD_LOGIC;
+        output : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
     );
-end Mux2;
+END Mux2;
 
-architecture ArchMux2 of Mux2 is
+ARCHITECTURE ArchMux2 OF Mux2 IS
 
-begin
-output <= a when selector ='0' else b; 
+BEGIN
+    output <= a WHEN selector = '0' ELSE
+        b;
 
-end architecture;
+END ARCHITECTURE;

@@ -31,7 +31,7 @@ ARCHITECTURE ArchContainer OF Container IS
             inData : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
             outData : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
         );
-    END COMPONENT;
+    END COMPONENT REG;
     SIGNAL pcSig : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL pcOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL memOut, memCom : STD_LOGIC_VECTOR(15 DOWNTO 0);

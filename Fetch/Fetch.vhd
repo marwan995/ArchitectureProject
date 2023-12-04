@@ -10,15 +10,18 @@ ENTITY Fetch IS
         callRtiFlag : IN STD_LOGIC;
         memoryPcFlag : IN STD_LOGIC;
         jumpPcFlag : IN STD_LOGIC;
+        assemblerWR : IN STD_LOGIC;
         immedateFlag : OUT STD_LOGIC;
 
         instructionIn : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        assemblerInstruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         instructionOut : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
         immedateOut : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 
         jumpPc : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         memoryPc : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         stackPc : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        assemblerPC : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         pcOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
 END Fetch;
@@ -66,17 +69,20 @@ ARCHITECTURE ArchFetch OF Fetch IS
             carryOut : OUT STD_LOGIC);
     END COMPONENT FullAdder;
 
+    SIGNAL instruction2Read : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL instruction : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL InstructionMuxOut : STD_LOGIC_VECTOR(15 DOWNTO 0);
 
+    SIGNAL instruction2ReadAddress : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL pcRegOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL pcRegIn : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL jmpMuxOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL pcMuxOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL updatedPc : STD_LOGIC_VECTOR(31 DOWNTO 0);
 BEGIN
+
     ImmidateValue : Mux2 PORT MAP(
-        instruction, (OTHERS => '0'), freeze, immedateOut
+    (OTHERS => '0'), instruction, freeze, immedateOut
     );
     InstructionFreeze : Mux2 PORT MAP(
         instruction, instructionIn, freeze, instructionMuxOut
@@ -87,8 +93,14 @@ BEGIN
     ImmidateFlag : TFlipFlop PORT MAP(
         instructionMuxOut(0), rst, '0', clk, immedateFlag, OPEN
     );
+
+    InstructionsMemoryPC : Mux2 GENERIC MAP(
+        32) PORT MAP(
+        pcRegOut, assemblerPc, assemblerWR, instruction2ReadAddress
+    );
+
     FetchInstruction : instructionMemory PORT MAP(
-        clk, '0', pcRegOut(11 DOWNTO 0), ((OTHERS => '0')),
+        clk, assemblerWR, instruction2ReadAddress(11 DOWNTO 0), assemblerInstruction,
         instruction
     );
 
@@ -102,15 +114,18 @@ BEGIN
         32) PORT MAP (
         pcRegOut, (OTHERS => '0'), '1', updatedPc, OPEN
     );
-    MemoryJump : Mux2 PORT MAP(
+    MemoryJump : Mux2 GENERIC MAP(
+        32) PORT MAP(
         jmpMuxOut, memoryPc, memoryPcFlag, pcRegIn
     );
 
-    Branch : Mux2 PORT MAP(
+    Branch : Mux2 GENERIC MAP(
+        32) PORT MAP(
         pcMuxOut, jumpPc, jumpPcFlag, jmpMuxOut
     );
 
-    stackJump : Mux2 PORT MAP(
+    stackJump : Mux2 GENERIC MAP(
+        32) PORT MAP(
         updatedPc, stackPc, callRtiFlag, pcMuxOut
     );
 END ARCHITECTURE;

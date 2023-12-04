@@ -18,7 +18,7 @@ ENTITY ControlUnit IS
         -- memory
         memoryEnable : OUT STD_LOGIC;
         memoryOrIO : OUT STD_LOGIC;
-        -- readOrWrite : OUT STD_LOGIC;
+        readOrWrite : OUT STD_LOGIC;
         addressSelector : OUT STD_LOGIC;
         memoryValueFlag : OUT STD_LOGIC;
         spEnable : OUT STD_LOGIC;

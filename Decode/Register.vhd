@@ -19,7 +19,7 @@ BEGIN
     BEGIN
         IF rst = '1' THEN
             reg <= (OTHERS => '0');
-        ELSIF falling_edge(clk) then
+        ELSIF falling_edge(clk) THEN
             reg <= inData;
 
         END IF;

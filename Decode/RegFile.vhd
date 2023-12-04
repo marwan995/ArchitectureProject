@@ -104,14 +104,32 @@ ARCHITECTURE ArchRegFile OF RegFile IS
     SIGNAL tristate6InputBus2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL tristate7InputBus2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-    SIGNAL reg0Clk : STD_LOGIC;
-    SIGNAL reg1Clk : STD_LOGIC;
-    SIGNAL reg2Clk : STD_LOGIC;
-    SIGNAL reg3Clk : STD_LOGIC;
-    SIGNAL reg4Clk : STD_LOGIC;
-    SIGNAL reg5Clk : STD_LOGIC;
-    SIGNAL reg6Clk : STD_LOGIC;
-    SIGNAL reg7Clk : STD_LOGIC;
+    SIGNAL reg0WriteEnable : STD_LOGIC;
+    SIGNAL reg1WriteEnable : STD_LOGIC;
+    SIGNAL reg2WriteEnable : STD_LOGIC;
+    SIGNAL reg3WriteEnable : STD_LOGIC;
+    SIGNAL reg4WriteEnable : STD_LOGIC;
+    SIGNAL reg5WriteEnable : STD_LOGIC;
+    SIGNAL reg6WriteEnable : STD_LOGIC;
+    SIGNAL reg7WriteEnable : STD_LOGIC;
+
+    SIGNAL tristate0EnableBus1 : STD_LOGIC;
+    SIGNAL tristate1EnableBus1 : STD_LOGIC;
+    SIGNAL tristate2EnableBus1 : STD_LOGIC;
+    SIGNAL tristate3EnableBus1 : STD_LOGIC;
+    SIGNAL tristate4EnableBus1 : STD_LOGIC;
+    SIGNAL tristate5EnableBus1 : STD_LOGIC;
+    SIGNAL tristate6EnableBus1 : STD_LOGIC;
+    SIGNAL tristate7EnableBus1 : STD_LOGIC;
+
+    SIGNAL tristate0EnableBus2 : STD_LOGIC;
+    SIGNAL tristate1EnableBus2 : STD_LOGIC;
+    SIGNAL tristate2EnableBus2 : STD_LOGIC;
+    SIGNAL tristate3EnableBus2 : STD_LOGIC;
+    SIGNAL tristate4EnableBus2 : STD_LOGIC;
+    SIGNAL tristate5EnableBus2 : STD_LOGIC;
+    SIGNAL tristate6EnableBus2 : STD_LOGIC;
+    SIGNAL tristate7EnableBus2 : STD_LOGIC;
 
 BEGIN
     -- 8 tristate buffer each one 1 bit from the input decoders
@@ -124,25 +142,44 @@ BEGIN
     writeBack1Reg : RegDecode PORT MAP(writeBack1Num, writeBackReg1EnableList);
     writeBack2Reg : RegDecode PORT MAP(writeBack2Num, writeBackReg2EnableList);
 
+    -- tristate0EnableBus1 <= buffer1EnableList(0) AND NOT(writeBackReg1EnableList(0) OR writeBackReg2EnableList(0));
+    tristate0EnableBus1 <= buffer1EnableList(0) AND NOT(writeBackReg1EnableList(0) AND writeBack1Enable);
+    tristate1EnableBus1 <= buffer1EnableList(1) AND NOT(writeBackReg1EnableList(1) AND writeBack1Enable);
+    tristate2EnableBus1 <= buffer1EnableList(2) AND NOT(writeBackReg1EnableList(2) AND writeBack1Enable);
+    tristate3EnableBus1 <= buffer1EnableList(3) AND NOT(writeBackReg1EnableList(3) AND writeBack1Enable);
+    tristate4EnableBus1 <= buffer1EnableList(4) AND NOT(writeBackReg1EnableList(4) AND writeBack1Enable);
+    tristate5EnableBus1 <= buffer1EnableList(5) AND NOT(writeBackReg1EnableList(5) AND writeBack1Enable);
+    tristate6EnableBus1 <= buffer1EnableList(6) AND NOT(writeBackReg1EnableList(6) AND writeBack1Enable);
+    tristate7EnableBus1 <= buffer1EnableList(7) AND NOT(writeBackReg1EnableList(7) AND writeBack1Enable);
+
+    tristate0EnableBus2 <= buffer2EnableList(0) AND NOT(writeBackReg2EnableList(0) AND writeBack2Enable);
+    tristate1EnableBus2 <= buffer2EnableList(1) AND NOT(writeBackReg2EnableList(1) AND writeBack2Enable);
+    tristate2EnableBus2 <= buffer2EnableList(2) AND NOT(writeBackReg2EnableList(2) AND writeBack2Enable);
+    tristate3EnableBus2 <= buffer2EnableList(3) AND NOT(writeBackReg2EnableList(3) AND writeBack2Enable);
+    tristate4EnableBus2 <= buffer2EnableList(4) AND NOT(writeBackReg2EnableList(4) AND writeBack2Enable);
+    tristate5EnableBus2 <= buffer2EnableList(5) AND NOT(writeBackReg2EnableList(5) AND writeBack2Enable);
+    tristate6EnableBus2 <= buffer2EnableList(6) AND NOT(writeBackReg2EnableList(6) AND writeBack2Enable);
+    tristate7EnableBus2 <= buffer2EnableList(7) AND NOT(writeBackReg2EnableList(7) AND writeBack2Enable);
+
     -- tristates for bus 1
-    tristate0bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer1EnableList(0), tristate0InputBus1, dataBus1);
-    tristate1bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer1EnableList(1), tristate1InputBus1, dataBus1);
-    tristate2bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer1EnableList(2), tristate2InputBus1, dataBus1);
-    tristate3bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer1EnableList(3), tristate3InputBus1, dataBus1);
-    tristate4bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer1EnableList(4), tristate4InputBus1, dataBus1);
-    tristate5bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer1EnableList(5), tristate5InputBus1, dataBus1);
-    tristate6bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer1EnableList(6), tristate6InputBus1, dataBus1);
-    tristate7bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer1EnableList(7), tristate7InputBus1, dataBus1);
+    tristate0bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate0EnableBus1, tristate0InputBus1, dataBus1);
+    tristate1bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate1EnableBus1, tristate1InputBus1, dataBus1);
+    tristate2bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate2EnableBus1, tristate2InputBus1, dataBus1);
+    tristate3bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate3EnableBus1, tristate3InputBus1, dataBus1);
+    tristate4bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate4EnableBus1, tristate4InputBus1, dataBus1);
+    tristate5bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate5EnableBus1, tristate5InputBus1, dataBus1);
+    tristate6bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate6EnableBus1, tristate6InputBus1, dataBus1);
+    tristate7bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate7EnableBus1, tristate7InputBus1, dataBus1);
 
     -- tristates for bus 2
-    tristate0bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer2EnableList(0), tristate0InputBus2, dataBus2);
-    tristate1bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer2EnableList(1), tristate1InputBus2, dataBus2);
-    tristate2bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer2EnableList(2), tristate2InputBus2, dataBus2);
-    tristate3bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer2EnableList(3), tristate3InputBus2, dataBus2);
-    tristate4bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer2EnableList(4), tristate4InputBus2, dataBus2);
-    tristate5bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer2EnableList(5), tristate5InputBus2, dataBus2);
-    tristate6bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer2EnableList(6), tristate6InputBus2, dataBus2);
-    tristate7bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(buffer2EnableList(7), tristate7InputBus2, dataBus2);
+    tristate0bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate0EnableBus2, tristate0InputBus2, dataBus2);
+    tristate1bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate1EnableBus2, tristate1InputBus2, dataBus2);
+    tristate2bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate2EnableBus2, tristate2InputBus2, dataBus2);
+    tristate3bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate3EnableBus2, tristate3InputBus2, dataBus2);
+    tristate4bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate4EnableBus2, tristate4InputBus2, dataBus2);
+    tristate5bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate5EnableBus2, tristate5InputBus2, dataBus2);
+    tristate6bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate6EnableBus2, tristate6InputBus2, dataBus2);
+    tristate7bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate7EnableBus2, tristate7InputBus2, dataBus2);
 
     -- reg input (muxes)
     reg0DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, writeBack2Enable, reg0MuxOutput);
@@ -155,24 +192,24 @@ BEGIN
     reg7DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, writeBack2Enable, reg7MuxOutput);
 
     -- reg enables
-    reg0Clk <= clk AND (writeBackReg1EnableList(0) OR writeBackReg2EnableList(0));
-    reg1Clk <= clk AND (writeBackReg1EnableList(1) OR writeBackReg2EnableList(1));
-    reg2Clk <= clk AND (writeBackReg1EnableList(2) OR writeBackReg2EnableList(2));
-    reg3Clk <= clk AND (writeBackReg1EnableList(3) OR writeBackReg2EnableList(3));
-    reg4Clk <= clk AND (writeBackReg1EnableList(4) OR writeBackReg2EnableList(4));
-    reg5Clk <= clk AND (writeBackReg1EnableList(5) OR writeBackReg2EnableList(5));
-    reg6Clk <= clk AND (writeBackReg1EnableList(6) OR writeBackReg2EnableList(6));
-    reg7Clk <= clk AND (writeBackReg1EnableList(7) OR writeBackReg2EnableList(7));
+    reg0WriteEnable <= clk AND ((writeBackReg1EnableList(0) AND writeBack1Enable) OR (writeBackReg2EnableList(0) AND writeBack2Enable));
+    reg1WriteEnable <= clk AND ((writeBackReg1EnableList(1) AND writeBack1Enable) OR (writeBackReg2EnableList(1) AND writeBack2Enable));
+    reg2WriteEnable <= clk AND ((writeBackReg1EnableList(2) AND writeBack1Enable) OR (writeBackReg2EnableList(2) AND writeBack2Enable));
+    reg3WriteEnable <= clk AND ((writeBackReg1EnableList(3) AND writeBack1Enable) OR (writeBackReg2EnableList(3) AND writeBack2Enable));
+    reg4WriteEnable <= clk AND ((writeBackReg1EnableList(4) AND writeBack1Enable) OR (writeBackReg2EnableList(4) AND writeBack2Enable));
+    reg5WriteEnable <= clk AND ((writeBackReg1EnableList(5) AND writeBack1Enable) OR (writeBackReg2EnableList(5) AND writeBack2Enable));
+    reg6WriteEnable <= clk AND ((writeBackReg1EnableList(6) AND writeBack1Enable) OR (writeBackReg2EnableList(6) AND writeBack2Enable));
+    reg7WriteEnable <= clk AND ((writeBackReg1EnableList(7) AND writeBack1Enable) OR (writeBackReg2EnableList(7) AND writeBack2Enable));
 
     -- regs
-    reg0 : REG GENERIC MAP(32) PORT MAP(reg0Clk, '0', reg0MuxOutput, reg0Output);
-    reg1 : REG GENERIC MAP(32) PORT MAP(reg1Clk, '0', reg1MuxOutput, reg1Output);
-    reg2 : REG GENERIC MAP(32) PORT MAP(reg2Clk, '0', reg2MuxOutput, reg2Output);
-    reg3 : REG GENERIC MAP(32) PORT MAP(reg3Clk, '0', reg3MuxOutput, reg3Output);
-    reg4 : REG GENERIC MAP(32) PORT MAP(reg4Clk, '0', reg4MuxOutput, reg4Output);
-    reg5 : REG GENERIC MAP(32) PORT MAP(reg5Clk, '0', reg5MuxOutput, reg5Output);
-    reg6 : REG GENERIC MAP(32) PORT MAP(reg6Clk, '0', reg6MuxOutput, reg6Output);
-    reg7 : REG GENERIC MAP(32) PORT MAP(reg7Clk, '0', reg7MuxOutput, reg7Output);
+    reg0 : REG GENERIC MAP(32) PORT MAP(reg0WriteEnable, '0', reg0MuxOutput, reg0Output);
+    reg1 : REG GENERIC MAP(32) PORT MAP(reg1WriteEnable, '0', reg1MuxOutput, reg1Output);
+    reg2 : REG GENERIC MAP(32) PORT MAP(reg2WriteEnable, '0', reg2MuxOutput, reg2Output);
+    reg3 : REG GENERIC MAP(32) PORT MAP(reg3WriteEnable, '0', reg3MuxOutput, reg3Output);
+    reg4 : REG GENERIC MAP(32) PORT MAP(reg4WriteEnable, '0', reg4MuxOutput, reg4Output);
+    reg5 : REG GENERIC MAP(32) PORT MAP(reg5WriteEnable, '0', reg5MuxOutput, reg5Output);
+    reg6 : REG GENERIC MAP(32) PORT MAP(reg6WriteEnable, '0', reg6MuxOutput, reg6Output);
+    reg7 : REG GENERIC MAP(32) PORT MAP(reg7WriteEnable, '0', reg7MuxOutput, reg7Output);
 
     -- assign reg output to tristate input
     tristate0InputBus1 <= reg0Output;

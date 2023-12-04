@@ -40,6 +40,7 @@ ARCHITECTURE ArchFetch OF Fetch IS
         GENERIC (n : INTEGER := 32);
         PORT (
             clk : IN STD_LOGIC;
+            en : IN STD_LOGIC;
             rst : IN STD_LOGIC;
             inData : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
             outData : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
@@ -106,7 +107,7 @@ BEGIN
 
     ProgramCounter : REG GENERIC MAP(
         32) PORT MAP(
-        clk, rst, pcRegIn, pcRegOut
+        clk, '1', rst, pcRegIn, pcRegOut
     );
 
     pcOut <= pcRegOut;

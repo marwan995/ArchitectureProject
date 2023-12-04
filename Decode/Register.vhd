@@ -6,6 +6,7 @@ ENTITY REG IS
     GENERIC (n : INTEGER := 32);
     PORT (
         clk : IN STD_LOGIC;
+        en : IN STD_LOGIC;
         rst : IN STD_LOGIC;
         inData : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
         outData : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
@@ -20,8 +21,10 @@ BEGIN
         IF rst = '1' THEN
             reg <= (OTHERS => '0');
         ELSIF falling_edge(clk) THEN
-            reg <= inData;
+            IF en = '1' THEN
+                reg <= inData;
 
+            END IF;
         END IF;
     END PROCESS;
 

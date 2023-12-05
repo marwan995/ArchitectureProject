@@ -7,12 +7,12 @@ ENTITY dataMemory IS
         w_r : IN STD_LOGIC;
         enable : IN STD_LOGIC;
         address : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
-        datain : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-        dataout : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+        datain : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        dataout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0));
 END ENTITY dataMemory;
 
 ARCHITECTURE Arch_dataMemory OF dataMemory IS TYPE dataMemory_type
-    IS ARRAY(0 TO 4096) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
+    IS ARRAY(0 TO 4096) OF STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL dataMemory : dataMemory_type;
 BEGIN
     PROCESS (clk) IS

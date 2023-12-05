@@ -116,6 +116,7 @@ ARCHITECTURE ArchMemory OF Memory IS
     SIGNAL instructionFreeCondation : STD_LOGIC;
 
     SIGNAL IO2WriteBack : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL isProtected : STD_LOGIC;
 BEGIN
 
     ---------------StackPointer -----------------------------
@@ -179,11 +180,13 @@ BEGIN
         flagsin, memory(3 DOWNTO 0), (NOT (memorySignals(6)) AND memorySignals(0)), flagsout
     );
     ---------------Memories -----------------------------
+    isProtected <= ((memoryProtectOut NOR MemorySignals(1)) OR
+                    (MemorySignals(1)) AND instruction(3));
     data : dataMemory PORT MAP(
-        clk, MemorySignals(6), (MemorySignals(8) AND NOT MemorySignals(7)), memoryAddress, memoryValueOut, memoryDataOut
+        clk, MemorySignals(6) and isProtected , (MemorySignals(8) AND NOT MemorySignals(7) and (not (MemorySignals(1)) or  instruction(3)) ), memoryAddress, memoryValueOut, memoryDataOut
     );
     protectedMemo : protectedMemory PORT MAP(
-        clk, MemorySignals(6), (MemorySignals(8) AND MemorySignals(7)), memoryAddress, NOT instruction(3), memoryProtectOut
+        clk, MemorySignals(1), MemorySignals(8), memoryAddress, NOT instruction(3), memoryProtectOut
     );
 
     ---------------I/O -----------------------------

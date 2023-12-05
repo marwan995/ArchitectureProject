@@ -9,27 +9,27 @@ ENTITY ControlUnit IS
         instruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 
         -- --alu 
-        aluEnable : OUT STD_LOGIC;
-        src1Selector : OUT STD_LOGIC;
-        src2Selector : OUT STD_LOGIC;
-        src3Selector : OUT STD_LOGIC;
-        aluOperationSelector : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        aluEnable : OUT STD_LOGIC; --7
+        src1Selector : OUT STD_LOGIC; --6
+        src2Selector : OUT STD_LOGIC; --5
+        src3Selector : OUT STD_LOGIC; --4
+        aluOperationSelector : OUT STD_LOGIC_VECTOR(3 DOWNTO 0); -- 3 to 0
 
         -- memory
-        memoryEnable : OUT STD_LOGIC;
-        memoryOrIO : OUT STD_LOGIC;
-        readOrWrite : OUT STD_LOGIC;
-        addressSelector : OUT STD_LOGIC;
-        memoryValueFlag : OUT STD_LOGIC;
-        spEnable : OUT STD_LOGIC;
-        spIncOrDec : OUT STD_LOGIC;
-        protectMemory : OUT STD_LOGIC;
-        jumpStopFlag : OUT STD_LOGIC;
+        memoryEnable : OUT STD_LOGIC;--8
+        memoryOrIO : OUT STD_LOGIC;--7
+        readOrWrite : OUT STD_LOGIC;--6
+        addressSelector : OUT STD_LOGIC;--5
+        memoryValueFlag : OUT STD_LOGIC;--4
+        spEnable : OUT STD_LOGIC;--3
+        spIncOrDec : OUT STD_LOGIC;--2
+        protectMemory : OUT STD_LOGIC;--1
+        jumpStopFlag : OUT STD_LOGIC;--0
 
         --write back
-        writeBackEnable : OUT STD_LOGIC;
-        reg2Write : OUT STD_LOGIC;
-        writeBackSelector : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+        writeBackEnable : OUT STD_LOGIC;--3
+        reg2Write : OUT STD_LOGIC;--2
+        writeBackSelector : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);--1 to 0
 
         --pc
         jmpFlag : OUT STD_LOGIC

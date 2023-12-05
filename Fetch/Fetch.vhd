@@ -110,7 +110,7 @@ BEGIN
         clk, '1', rst, pcRegIn, pcRegOut
     );
 
-    pcOut <= pcRegOut;
+    pcOut <= updatedPc;
     incrementPc : FullAdder GENERIC MAP(
         32) PORT MAP (
         pcRegOut, (OTHERS => '0'), '1', updatedPc, OPEN

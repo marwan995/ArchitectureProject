@@ -237,6 +237,9 @@ BEGIN
         EX_MEM_input(95 DOWNTO 64)
     );
 
+    -- forward WB flags
+    EX_MEM_input(131 DOWNTO 128) <= ID_EX_output(99 DOWNTO 96);
+
     -- forward instruction
     EX_MEM_input(156 DOWNTO 141) <= ID_EX_output(133 DOWNTO 118);
 

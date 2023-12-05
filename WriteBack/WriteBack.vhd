@@ -70,6 +70,6 @@ BEGIN
         reg1Value, memory, memorySelector, memoryPc
     );
     ---- writeBack2Data
-    writeBack2Data <= (others => '0'); 
+    writeBack2Data <= reg2Value; 
 
 END ARCHITECTURE;

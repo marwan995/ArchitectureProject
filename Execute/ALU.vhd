@@ -78,7 +78,10 @@ BEGIN
 
     result <= resultTemp;
 
-    flagReg(0) <= '1' WHEN resultTemp = "00000000000000000000000000000000"
+    flagReg(0) <= flagReg(0) WHEN enable = '0'
+ELSE
+    '1' WHEN
+    resultTemp = "00000000000000000000000000000000"
 ELSE
     '0';
 

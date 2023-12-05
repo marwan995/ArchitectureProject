@@ -6,6 +6,7 @@ ENTITY IO IS
     PORT (
         clk : IN STD_LOGIC;
         enable : IN STD_LOGIC;
+        rst : IN STD_LOGIC;
         I_O : IN STD_LOGIC; -- 0 input 1 output
 
         InputPort : IN STD_LOGIC_VECTOR(31 DOWNTO 0); -- in from CPU
@@ -36,7 +37,7 @@ BEGIN
     inEnable <= enable AND NOT(I_O);
     outEnable <= enable AND I_O;
 
-    inputLatch : REG PORT MAP(clk, inEnable, '0', InputPort, IO2WB);
-    outputLatch : REG PORT MAP(clk, outEnable, '0', regVal, OutputPort);
+    inputLatch : REG PORT MAP(clk, inEnable, rst, InputPort, IO2WB);
+    outputLatch : REG PORT MAP(clk, outEnable, rst, regVal, OutputPort);
 
 END ARCHITECTURE;

@@ -86,6 +86,7 @@ ARCHITECTURE ArchMemory OF Memory IS
         PORT (
             clk : IN STD_LOGIC;
             enable : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
             I_O : IN STD_LOGIC; -- 0 input 1 output
 
             InputPort : IN STD_LOGIC_VECTOR(31 DOWNTO 0); -- in from CPU
@@ -117,11 +118,11 @@ ARCHITECTURE ArchMemory OF Memory IS
     SIGNAL memoryOutTemp : STD_LOGIC_VECTOR (31 DOWNTO 0);
     SIGNAL isProtected : STD_LOGIC;
     SIGNAL initial_value : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL flagSelector : STD_LOGIC ;
-    SIGNAL dataMemoryWR : STD_LOGIC ;
+    SIGNAL flagSelector : STD_LOGIC;
+    SIGNAL dataMemoryWR : STD_LOGIC;
     SIGNAL dataMemoryEnable : STD_LOGIC;
-    SIGNAL protectedMemoryDataIn : STD_LOGIC ;
-    SIGNAL IoEnable : STD_LOGIC ;
+    SIGNAL protectedMemoryDataIn : STD_LOGIC;
+    SIGNAL IoEnable : STD_LOGIC;
 BEGIN
 
     ---------------StackPointer -----------------------------
@@ -184,35 +185,36 @@ BEGIN
     );
     ---------------Flags -----------------------------
     flagSelector <= (NOT (memorySignals(6)) AND memorySignals(0));
-    
+
     flags : Mux2 GENERIC MAP(
         4) PORT MAP(
         flagsin, memoryOutTemp(3 DOWNTO 0), flagSelector, flagsout
     );
     ---------------Memories -----------------------------
     isProtected <= ((memoryProtectOut NOR MemorySignals(1)) OR (MemorySignals(1) AND instruction(3)));
-    
+
     dataMemoryEnable <= (MemorySignals(8) AND NOT MemorySignals(7) AND (NOT (MemorySignals(1)) OR instruction(3)));
     dataMemoryWR <= MemorySignals(6) AND isProtected;
 
     data : dataMemory PORT MAP(
-        clk, dataMemoryWR, dataMemoryEnable, memoryAddress(11 downto 0), memoryValueOut, memoryDataOut
+        clk, dataMemoryWR, dataMemoryEnable, memoryAddress(11 DOWNTO 0), memoryValueOut, memoryDataOut
     );
-protectedMemoryDataIn <= NOT instruction(3);
+    protectedMemoryDataIn <= NOT instruction(3);
 
     protectedMemo : protectedMemory PORT MAP(
-        clk, MemorySignals(1), MemorySignals(8), memoryAddress(11 downto 0), protectedMemoryDataIn, memoryProtectOut
+        clk, MemorySignals(1), MemorySignals(8), memoryAddress(11 DOWNTO 0), protectedMemoryDataIn, memoryProtectOut
     );
 
     ---------------I/O -----------------------------
     IoEnable <= (MemorySignals(8) AND MemorySignals(7));
-    
+
     I_O : IO PORT MAP(
         clk,
         IoEnable,
+        rst,
         MemorySignals(6),
         inputPort,
-        memoryValueOut,
+        reg1Value,
         outputPort,
         IO2WriteBack);
 

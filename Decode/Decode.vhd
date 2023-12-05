@@ -11,6 +11,7 @@ ENTITY Decode IS
         immedateValue : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         writeBack1Enable : IN STD_LOGIC;
         writeBack2Enable : IN STD_LOGIC;
+        
         writeBack1Address : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
         writeBack2Address : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
 

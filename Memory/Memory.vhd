@@ -48,7 +48,37 @@ ARCHITECTURE ArchMemory OF Memory IS
             sum : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
             carryOut : OUT STD_LOGIC);
     END COMPONENT FullAdder;
-    SIGNAL StackPointerIn : STD_LOGIC_VECTOR(31 DOWNTO 0):="00000000000000000000111111111111";
+    COMPONENT IncDecALU IS
+        GENERIC (n : INTEGER := 32);
+        PORT (
+            enable : IN STD_LOGIC;
+            inc : IN STD_LOGIC;
+
+            a : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+            incVal : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+
+            result : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
+        );
+    END COMPONENT IncDecALU;
+    COMPONENT dataMemory IS
+        PORT (
+            clk : IN STD_LOGIC;
+            w_r : IN STD_LOGIC;
+            enable : IN STD_LOGIC;
+            address : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
+            datain : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            dataout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0));
+    END COMPONENT dataMemory;
+    COMPONENT protectedMemory IS
+        PORT (
+            clk : IN STD_LOGIC;
+            w_r : IN STD_LOGIC;
+            enable : IN STD_LOGIC;
+            address : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
+            protectedin : IN STD_LOGIC;
+            protectedout : OUT STD_LOGIC);
+    END COMPONENT protectedMemory;
+    SIGNAL StackPointerIn : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000111111111111";
     SIGNAL StackPointerOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL StackPointerPlus4 : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL StackPointerPlus2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -60,6 +90,8 @@ ARCHITECTURE ArchMemory OF Memory IS
     SIGNAL flagsOrPcPlus1Out : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL callOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL memoryValueOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL memoryDataOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL memoryProtectOut : STD_LOGIC;
     SIGNAL flagsOrPcPlus1Selector : STD_LOGIC;
     SIGNAL instructionFreeCondation : STD_LOGIC;
 BEGIN
@@ -70,8 +102,7 @@ BEGIN
         32) PORT MAP(
         clk, MemorySignals(3), rst, StackPointerIn, StackPointerOut
     );
-
-
+    changeSp : IncDecALU GENERIC MAP(32) PORT MAP(MemorySignals(3), MemorySignals(2), StackPointerIn, (OTHERS => '0', "10"), StackPointerOut);
     ---------------increment -----------------------------
 
     SpPlusTwo : FullAdder GENERIC MAP(
@@ -123,8 +154,19 @@ BEGIN
     ---------------Flags -----------------------------
     flags : Mux2 GENERIC MAP(
         32) PORT MAP(
-            flagsin,memory(3 downto 0),(not (memorySignals(6)) and memorySignals(0) ),flagsout
+        flagsin, memory(3 DOWNTO 0), (NOT (memorySignals(6)) AND memorySignals(0)), flagsout
     );
-
+    ---------------Memories -----------------------------
+    data : dataMemory PORT MAP(
+        clk, MemorySignals(6), (MemorySignals(8) AND NOT MemorySignals(7)), memoryAddress, memoryValueOut, memoryDataOut
+    );
+    protectedMemo : protectedMemory PORT MAP(
+        clk, MemorySignals(6), (MemorySignals(8) AND MemorySignals(7)), memoryAddress, NOT instruction(3), memoryProtectOut
+    );
+    ---------------pick memroy Out -----------------------------
+    memoryResult : Mux2 GENERIC MAP(
+        32) PORT MAP(
+            memoryDataOut,'0',MemorySignals(7),memoryOut
+    );
 
 END ARCHITECTURE;

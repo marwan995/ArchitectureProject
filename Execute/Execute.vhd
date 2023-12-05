@@ -48,14 +48,12 @@ ARCHITECTURE ArchExecute OF Execute IS
         );
     END COMPONENT Mux2;
 
-    SIGNAL aIn : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL bIn : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
 BEGIN
 
-    aMux : Mux2 GENERIC MAP(32) PORT MAP(src1, src2, src1Sel, aIn);
     bMux : Mux2 GENERIC MAP(32) PORT MAP(src2, immediateVal, src2Sel, bIn);
 
-    executeALU : ALU PORT MAP(aIn, bIn, operationSel, ALUout, ALUCout, flagReg);
+    executeALU : ALU PORT MAP(aluEnable, src1, bIn, operationSel, ALUout, ALUCout, flagReg);
 
 END ARCHITECTURE;

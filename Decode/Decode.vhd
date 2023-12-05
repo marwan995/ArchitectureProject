@@ -93,12 +93,26 @@ ARCHITECTURE ArchDecode OF Decode IS
         );
     END COMPONENT ControlUnit;
 
+    SIGNAL regNum1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL regNum2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+
 BEGIN
     ExtendTheImmedateValue : SignExtend PORT MAP(
         immedateValue, immedateValueExtended
     );
+
+    regNum1 <= instruction(10 DOWNTO 8) WHEN (instruction(15) AND NOT(instruction(14))) OR ((instruction(15)) AND instruction(14))
+        ELSE
+        instruction(13 DOWNTO 11)
+        ;
+
+    regNum2 <= instruction(7 DOWNTO 5) WHEN (instruction(15) AND NOT(instruction(14))) OR ((instruction(15)) AND instruction(14))
+        ELSE
+        instruction(10 DOWNTO 8)
+        ;
+
     UpdateTheRegisters : RegFile PORT MAP(-- if 3 oprand  takes 2 , 3
-        clk, instruction(13 DOWNTO 11), instruction(10 DOWNTO 8),
+        clk, regNum1, regNum2,
         writeBack1Enable, writeBack2Enable,
         writeBack1Address, writeBack2Address, writeBack1Data, writeBack2Data, reg1Value, reg2Value
     );
@@ -108,8 +122,6 @@ BEGIN
         alu(7), alu(6), alu(5), alu(4), alu(3 DOWNTO 0),
         memory(8), memory(7), memory(6), memory(5), memory(4), memory(3), memory(2), memory(1), memory(0),
         writeBack(3), writeBack(2), writeBack(1 DOWNTO 0)
-        ,jmpFlag
+        , jmpFlag
     );
-
-
 END ARCHITECTURE;

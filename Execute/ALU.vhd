@@ -51,6 +51,7 @@ ARCHITECTURE ARCHALU OF ALU IS
 
     SIGNAL adderOperationSel : STD_LOGIC_VECTOR(1 DOWNTO 0);
     SIGNAL adderCin : STD_LOGIC;
+    SIGNAL resultTemp : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
 BEGIN
 
@@ -67,7 +68,7 @@ BEGIN
     OrOperation : ALUOR PORT MAP(a, b, orOutput);
     AdderOperations : ALUADDER PORT MAP(a, b, adderCin, adderOperationSel, adderOutput, adderCout);
 
-    result <= (OTHERS => '0') WHEN enable = '0'
+    resultTemp <= (OTHERS => '0') WHEN enable = '0'
         ELSE
         notOutput WHEN operationSel = "0001" -- not
         ELSE
@@ -76,5 +77,11 @@ BEGIN
         orOutput WHEN operationSel = "1100" -- or
         ELSE
         (OTHERS => 'Z');
+
+    result <= resultTemp;
+
+    flagReg(0) <= '1' WHEN resultTemp = "00000000000000000000000000000000"
+ELSE
+    '0';
 
 END ARCHITECTURE;

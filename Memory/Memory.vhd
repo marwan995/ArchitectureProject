@@ -9,8 +9,6 @@ ENTITY Memory IS
         instruction : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
         MemorySignals : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
         immedate : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
-        alu : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
-        memory : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
         reg1Value : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
         flagsIn : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
         flagsOut : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
@@ -20,7 +18,7 @@ ENTITY Memory IS
         inputPort : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
         outputPort : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
 
-        memoryOut : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+        memoryOut : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
 
     );
 END Memory;
@@ -116,7 +114,14 @@ ARCHITECTURE ArchMemory OF Memory IS
     SIGNAL instructionFreeCondation : STD_LOGIC;
 
     SIGNAL IO2WriteBack : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL memoryOutTemp : STD_LOGIC_VECTOR (31 DOWNTO 0);
     SIGNAL isProtected : STD_LOGIC;
+    SIGNAL initial_value : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL flagSelector : STD_LOGIC ;
+    SIGNAL dataMemoryWR : STD_LOGIC ;
+    SIGNAL dataMemoryEnable : STD_LOGIC;
+    SIGNAL protectedMemoryDataIn : STD_LOGIC ;
+    SIGNAL IoEnable : STD_LOGIC ;
 BEGIN
 
     ---------------StackPointer -----------------------------
@@ -125,16 +130,16 @@ BEGIN
         32) PORT MAP(
         clk, MemorySignals(3), rst, StackPointerIn, StackPointerOut
     );
-    changeSp : IncDecALU GENERIC MAP(32) PORT MAP(MemorySignals(3), MemorySignals(2), StackPointerIn, (OTHERS => '0', "10"), StackPointerOut);
+    changeSp : IncDecALU GENERIC MAP(32) PORT MAP(MemorySignals(3), MemorySignals(2), StackPointerIn, "00000000000000000000000000000010", StackPointerOut);
     ---------------increment -----------------------------
 
     SpPlusTwo : FullAdder GENERIC MAP(
         32)PORT MAP (
-        StackPointerOut, "0000000000000010", '0', StackPointerPlus2, OPEN
+        StackPointerOut, "00000000000000000000000000000010", '0', StackPointerPlus2, OPEN
     );
     SpPlusFour : FullAdder GENERIC MAP(
         32)PORT MAP (
-        StackPointerOut, "0000000000000100", '0', StackPointerPlus4, OPEN
+        StackPointerOut, "00000000000000000000000000000100", '0', StackPointerPlus4, OPEN
     );
     ---------------Address -----------------------------
 
@@ -159,9 +164,12 @@ BEGIN
         32) PORT MAP (
         pc, (OTHERS => '0'), '1', PcPlus1, OPEN
     );
+
+    initial_value <= "0000000000000000000000000000" & flagsIn;
+
     flagsOrPcPlus1 : Mux2 GENERIC MAP(
         32) PORT MAP(
-        PcPlus1, "0000000000000000000000000000" & flagsIn, MemorySignals(0), flagsOrPcPlus1Out
+        PcPlus1, initial_value, MemorySignals(0), flagsOrPcPlus1Out
     );
 
     flagsOrPcPlus1Selector <= (NOT instruction(15) AND (instruction(1) AND instruction(2)));
@@ -175,24 +183,33 @@ BEGIN
         callOut, (OTHERS => '0'), instructionFreeCondation, memoryValueOut
     );
     ---------------Flags -----------------------------
+    flagSelector <= (NOT (memorySignals(6)) AND memorySignals(0));
+    
     flags : Mux2 GENERIC MAP(
-        32) PORT MAP(
-        flagsin, memory(3 DOWNTO 0), (NOT (memorySignals(6)) AND memorySignals(0)), flagsout
+        4) PORT MAP(
+        flagsin, memoryOutTemp(3 DOWNTO 0), flagSelector, flagsout
     );
     ---------------Memories -----------------------------
-    isProtected <= ((memoryProtectOut NOR MemorySignals(1)) OR
-                    (MemorySignals(1)) AND instruction(3));
+    isProtected <= ((memoryProtectOut NOR MemorySignals(1)) OR (MemorySignals(1) AND instruction(3)));
+    
+    dataMemoryEnable <= (MemorySignals(8) AND NOT MemorySignals(7) AND (NOT (MemorySignals(1)) OR instruction(3)));
+    dataMemoryWR <= MemorySignals(6) AND isProtected;
+
     data : dataMemory PORT MAP(
-        clk, MemorySignals(6) and isProtected , (MemorySignals(8) AND NOT MemorySignals(7) and (not (MemorySignals(1)) or  instruction(3)) ), memoryAddress, memoryValueOut, memoryDataOut
+        clk, dataMemoryWR, dataMemoryEnable, memoryAddress(11 downto 0), memoryValueOut, memoryDataOut
     );
+protectedMemoryDataIn <= NOT instruction(3);
+
     protectedMemo : protectedMemory PORT MAP(
-        clk, MemorySignals(1), MemorySignals(8), memoryAddress, NOT instruction(3), memoryProtectOut
+        clk, MemorySignals(1), MemorySignals(8), memoryAddress(11 downto 0), protectedMemoryDataIn, memoryProtectOut
     );
 
     ---------------I/O -----------------------------
+    IoEnable <= (MemorySignals(8) AND MemorySignals(7));
+    
     I_O : IO PORT MAP(
         clk,
-        (MemorySignals(8) AND MemorySignals(7)),
+        IoEnable,
         MemorySignals(6),
         inputPort,
         memoryValueOut,
@@ -202,7 +219,8 @@ BEGIN
     ---------------pick memroy Out -----------------------------
     memoryResult : Mux2 GENERIC MAP(
         32) PORT MAP(
-        memoryDataOut, IO2WriteBack, MemorySignals(7), memoryOut
+        memoryDataOut, IO2WriteBack, MemorySignals(7), memoryOutTemp
     );
+    memoryOut <= memoryOutTemp;
 
 END ARCHITECTURE;

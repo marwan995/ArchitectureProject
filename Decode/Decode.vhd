@@ -101,12 +101,12 @@ BEGIN
         immedateValue, immedateValueExtended
     );
 
-    regNum1 <= instruction(10 DOWNTO 8) WHEN (instruction(15) AND NOT(instruction(14))) OR ((instruction(15)) AND instruction(14))
+    regNum1 <= instruction(10 DOWNTO 8) WHEN (instruction(15) ='1' AND instruction(14) = '0') OR (instruction(15)='1' AND instruction(14) = '1')
         ELSE
         instruction(13 DOWNTO 11)
         ;
 
-    regNum2 <= instruction(7 DOWNTO 5) WHEN (instruction(15) AND NOT(instruction(14))) OR ((instruction(15)) AND instruction(14))
+    regNum2 <= instruction(7 DOWNTO 5) WHEN (instruction(15) = '1' AND instruction(14) = '0') OR (instruction(15) = '1' AND instruction(14) = '1')
         ELSE
         instruction(10 DOWNTO 8)
         ;

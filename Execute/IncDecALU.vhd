@@ -24,11 +24,7 @@ ARCHITECTURE ArchIncDecALU OF IncDecALU IS
             CIN : IN STD_LOGIC;
             S : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
             F : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
-            COUT : OUT STD_LOGIC;
-
-            testTemp : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
-            testResult : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
-            testB : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
+            COUT : OUT STD_LOGIC
         );
     END COMPONENT ALUADDER;
 

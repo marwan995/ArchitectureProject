@@ -11,7 +11,6 @@ ENTITY ALU IS
         operationSel : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 
         result : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-        cout : OUT STD_LOGIC;
         flagReg : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
     );
 END ALU;
@@ -46,7 +45,6 @@ ARCHITECTURE ARCHALU OF ALU IS
 
     SIGNAL notOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL adderOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL adderCout : STD_LOGIC;
     SIGNAL orOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     SIGNAL adderOperationSel : STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -66,7 +64,7 @@ BEGIN
 
     NotOperation : ALUNOT PORT MAP(a, notOutput);
     OrOperation : ALUOR PORT MAP(a, b, orOutput);
-    AdderOperations : ALUADDER PORT MAP(a, b, adderCin, adderOperationSel, adderOutput, adderCout);
+    AdderOperations : ALUADDER PORT MAP(a, b, adderCin, adderOperationSel, adderOutput, flagReg(2));
 
     resultTemp <= (OTHERS => '0') WHEN enable = '0'
         ELSE

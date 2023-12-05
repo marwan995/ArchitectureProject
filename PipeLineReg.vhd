@@ -2,29 +2,26 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 
-ENTITY REG IS
+ENTITY PipeLineReg IS
     GENERIC (n : INTEGER := 32);
     PORT (
-        clk : IN STD_LOGIC;
-        en : IN STD_LOGIC;
+        writeEnable : IN STD_LOGIC;
         rst : IN STD_LOGIC;
         inData : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
         outData : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
     );
-END REG;
+END PipeLineReg;
 
-ARCHITECTURE ArchREG OF REG IS
+ARCHITECTURE ArchPipeLineReg OF PipeLineReg IS
     SIGNAL reg : STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
 BEGIN
-    PROCESS (clk, rst)
+    PROCESS (writeEnable, rst)
     BEGIN
         IF rst = '1' THEN
             reg <= (OTHERS => '0');
-        ELSIF falling_edge(clk) THEN
-            IF en = '1' THEN
+        ELSIF rising_edge(writeEnable) THEN
                 reg <= inData;
 
-            END IF;
         END IF;
     END PROCESS;
 

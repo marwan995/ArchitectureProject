@@ -18,26 +18,25 @@ ENTITY IO IS
 END IO;
 
 ARCHITECTURE ArchIO OF IO IS
-    COMPONENT REG IS
+    COMPONENT PipeLineReg IS
         GENERIC (n : INTEGER := 32);
         PORT (
-            clk : IN STD_LOGIC;
-            en : IN STD_LOGIC;
+            writeEnable : IN STD_LOGIC;
             rst : IN STD_LOGIC;
             inData : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
             outData : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
         );
-    END COMPONENT REG;
+    END COMPONENT PipeLineReg;
 
     SIGNAL inEnable : STD_LOGIC;
     SIGNAL outEnable : STD_LOGIC;
 
 BEGIN
 
-    inEnable <= enable AND NOT(I_O);
-    outEnable <= enable AND I_O;
+    inEnable <= enable AND NOT(I_O) AND clk;
+    outEnable <= enable AND I_O AND clk;
 
-    inputLatch : REG PORT MAP(clk, inEnable, rst, InputPort, IO2WB);
-    outputLatch : REG PORT MAP(clk, outEnable, rst, regVal, OutputPort);
+    inputLatch : PipeLineReg PORT MAP(inEnable, rst, InputPort, IO2WB);
+    outputLatch : PipeLineReg PORT MAP(outEnable, rst, regVal, OutputPort);
 
 END ARCHITECTURE;

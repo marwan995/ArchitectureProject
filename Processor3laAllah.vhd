@@ -12,7 +12,10 @@ ENTITY Processor IS
         assemblerPC : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         inttrupt : IN STD_LOGIC;
-        outPort : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        outPort : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+        reg1Test: out std_logic_vector(2 downto 0);
+        reg2Test: out std_logic_vector(2 downto 0)
     );
 END Processor;
 
@@ -62,7 +65,10 @@ ARCHITECTURE ArchProcessor OF Processor IS
             writeBack : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             memory : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
             alu : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            jmpFlag : OUT STD_LOGIC
+            jmpFlag : OUT STD_LOGIC;
+
+            reg1Test: out std_logic_vector(2 downto 0);
+            reg2Test: out std_logic_vector(2 downto 0)
             -- instructionOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             -- pcOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
@@ -202,7 +208,9 @@ BEGIN
         ID_EX_input(99 DOWNTO 96),
         ID_EX_input(108 DOWNTO 100),
         ID_EX_input(116 DOWNTO 109),
-        ID_EX_input(117)
+        ID_EX_input(117),
+        reg1Test,
+        reg2Test
     );
 
     -- forward instruction

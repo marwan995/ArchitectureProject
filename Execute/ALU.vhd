@@ -50,6 +50,7 @@ ARCHITECTURE ARCHALU OF ALU IS
     SIGNAL adderOperationSel : STD_LOGIC_VECTOR(1 DOWNTO 0);
     SIGNAL adderCin : STD_LOGIC;
     SIGNAL resultTemp : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL flagRegBuffer : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";
 
 BEGIN
 
@@ -64,7 +65,7 @@ BEGIN
 
     NotOperation : ALUNOT PORT MAP(a, notOutput);
     OrOperation : ALUOR PORT MAP(a, b, orOutput);
-    AdderOperations : ALUADDER PORT MAP(a, b, adderCin, adderOperationSel, adderOutput, flagReg(2));
+    AdderOperations : ALUADDER PORT MAP(a, b, adderCin, adderOperationSel, adderOutput, flagRegBuffer(2));
 
     resultTemp <= (OTHERS => '0') WHEN enable = '0'
         ELSE
@@ -78,11 +79,11 @@ BEGIN
 
     result <= resultTemp;
 
-    flagReg(0) <= flagReg(0) WHEN enable = '0'
-ELSE
-    '1' WHEN
-    resultTemp = "00000000000000000000000000000000"
-ELSE
-    '0';
+    flagReg <= flagRegBuffer WHEN enable = '0'
+        ELSE
+        (flagRegBuffer(3 DOWNTO 1) & '1') WHEN
+        resultTemp = "00000000000000000000000000000000"
+        ELSE
+        (OTHERS => '0');
 
 END ARCHITECTURE;

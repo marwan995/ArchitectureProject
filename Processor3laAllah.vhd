@@ -148,8 +148,8 @@ ARCHITECTURE ArchProcessor OF Processor IS
     SIGNAL EX_MEM_input : STD_LOGIC_VECTOR(194 DOWNTO 0) := (OTHERS => '0');
     SIGNAL EX_MEM_output : STD_LOGIC_VECTOR(194 DOWNTO 0) := (OTHERS => '0');
 
-    SIGNAL MEM_WB_input : STD_LOGIC_VECTOR(212 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL MEM_WB_output : STD_LOGIC_VECTOR(212 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL MEM_WB_input : STD_LOGIC_VECTOR(211 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL MEM_WB_output : STD_LOGIC_VECTOR(211 DOWNTO 0) := (OTHERS => '0');
 
     -- WR outputs
     SIGNAL writeBack1EnableSig : STD_LOGIC;
@@ -237,6 +237,12 @@ BEGIN
         EX_MEM_input(95 DOWNTO 64)
     );
 
+    -- forward instruction
+    EX_MEM_input(156 DOWNTO 141) <= ID_EX_output(133 DOWNTO 118);
+
+    -- forward pc
+    EX_MEM_input(188 DOWNTO 157) <= ID_EX_output(165 DOWNTO 134);
+
     -- 31:0 src1,       63:32 src2,   95:64 ALU output,
     --  127:96 immediate(sign extended),
     -- 131:128 WB,       140:132 MEM,    ,    156:141 instruction,
@@ -261,10 +267,26 @@ BEGIN
         MEM_WB_input(95 DOWNTO 64)
     );
 
+    -- forward src2
+    MEM_WB_input(63 DOWNTO 32) <= EX_MEM_output(63 DOWNTO 32);
+
+    -- forward immediate
+    MEM_WB_input(159 DOWNTO 128) <= EX_MEM_output(127 DOWNTO 96);
+
+    -- forward WB
+    MEM_WB_input(163 DOWNTO 160) <= EX_MEM_output(131 DOWNTO 128);
+
+    -- forward instruction
+    MEM_WB_input(179 DOWNTO 164) <= EX_MEM_output(156 DOWNTO 141);
+
+    -- forward pc
+    MEM_WB_input(211 DOWNTO 180) <= EX_MEM_output(188 DOWNTO 157);
+
     -- 31:0 src1,   63:32 src2,     95:64 mem,      127:96 alu,
-    -- 159:128 immediate,    163:160 WB,       179:164 instruction
+    -- 159:128 immediate,    163:160 WB,       179:164 instruction,
+    -- 211:180 pc
     MEM_WB : pipeLineReg GENERIC MAP(
-        213) PORT MAP(
+        212) PORT MAP(
         clock, rst, MEM_WB_input, MEM_WB_output
     );
 

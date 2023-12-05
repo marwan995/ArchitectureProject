@@ -15,6 +15,11 @@ ENTITY Memory IS
         flagsIn : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
         flagsOut : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
         pc : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+
+        --IO
+        inputPort : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+        outputPort : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
+
         memoryOut : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
 
     );
@@ -78,6 +83,21 @@ ARCHITECTURE ArchMemory OF Memory IS
             protectedin : IN STD_LOGIC;
             protectedout : OUT STD_LOGIC);
     END COMPONENT protectedMemory;
+
+    COMPONENT IO IS
+        PORT (
+            clk : IN STD_LOGIC;
+            enable : IN STD_LOGIC;
+            I_O : IN STD_LOGIC; -- 0 input 1 output
+
+            InputPort : IN STD_LOGIC_VECTOR(31 DOWNTO 0); -- in from CPU
+            RegVal : IN STD_LOGIC_VECTOR(31 DOWNTO 0); -- value from last stage
+
+            OutputPort : OUT STD_LOGIC_VECTOR(31 DOWNTO 0); -- out to CPU
+            IO2WB : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        );
+    END COMPONENT IO;
+
     SIGNAL StackPointerIn : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000111111111111";
     SIGNAL StackPointerOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL StackPointerPlus4 : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -94,6 +114,8 @@ ARCHITECTURE ArchMemory OF Memory IS
     SIGNAL memoryProtectOut : STD_LOGIC;
     SIGNAL flagsOrPcPlus1Selector : STD_LOGIC;
     SIGNAL instructionFreeCondation : STD_LOGIC;
+
+    SIGNAL IO2WriteBack : STD_LOGIC_VECTOR(31 DOWNTO 0);
 BEGIN
 
     ---------------StackPointer -----------------------------
@@ -163,10 +185,21 @@ BEGIN
     protectedMemo : protectedMemory PORT MAP(
         clk, MemorySignals(6), (MemorySignals(8) AND MemorySignals(7)), memoryAddress, NOT instruction(3), memoryProtectOut
     );
+
+    ---------------I/O -----------------------------
+    I_O : IO PORT MAP(
+        clk,
+        (MemorySignals(8) AND MemorySignals(7)),
+        MemorySignals(6),
+        inputPort,
+        memoryValueOut,
+        outputPort,
+        IO2WriteBack);
+
     ---------------pick memroy Out -----------------------------
     memoryResult : Mux2 GENERIC MAP(
         32) PORT MAP(
-            memoryDataOut,'0',MemorySignals(7),memoryOut
+        memoryDataOut, IO2WriteBack, MemorySignals(7), memoryOut
     );
 
 END ARCHITECTURE;

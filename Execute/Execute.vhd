@@ -26,6 +26,7 @@ ARCHITECTURE ArchExecute OF Execute IS
 
     COMPONENT ALU IS
         PORT (
+            enable : IN STD_LOGIC;
             a : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             b : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 

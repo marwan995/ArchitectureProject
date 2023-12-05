@@ -4,6 +4,7 @@ USE ieee.numeric_std.ALL;
 
 ENTITY ALU IS
     PORT (
+        enable : IN STD_LOGIC;
         a : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         b : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
@@ -66,7 +67,9 @@ BEGIN
     OrOperation : ALUOR PORT MAP(a, b, orOutput);
     AdderOperations : ALUADDER PORT MAP(a, b, adderCin, adderOperationSel, adderOutput, adderCout);
 
-    result <= notOutput WHEN operationSel = "0001" -- not
+    result <= (OTHERS => '0') WHEN enable = '0'
+        ELSE
+        notOutput WHEN operationSel = "0001" -- not
         ELSE
         adderOutput WHEN operationSel = "0100" -- dec
         ELSE

@@ -1,0 +1,18 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+
+ENTITY ALUOR IS
+    PORT (
+        a : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        b : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        result : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+    );
+END ALUOR;
+
+ARCHITECTURE ArchALUOR OF ALUOR IS
+BEGIN
+
+    result <= a OR b;
+
+END ARCHITECTURE;

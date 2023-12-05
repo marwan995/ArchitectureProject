@@ -9,6 +9,7 @@ ENTITY IncDecALU IS
         inc : IN STD_LOGIC;
 
         a : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+        incVal : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
 
         result : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
     );
@@ -36,13 +37,15 @@ ARCHITECTURE ArchIncDecALU OF IncDecALU IS
 
 BEGIN
 
-    incDecSel <= "00" WHEN enable = '0' OR inc = '1'
+    incDecSel <= "00" WHEN enable = '0'
         ELSE
-        "11" WHEN inc = '0'
+        "01" WHEN inc = '1'
+        ELSE
+        "10" WHEN inc = '0'
         ;
 
     adderCin <= '0' WHEN enable = '0' ELSE
-        inc;
+        NOT(inc);
 
-    IncDecAdder : ALUADDER PORT MAP(a, (OTHERS => '0'), inc, incDecSel, result);
+    IncDecAdder : ALUADDER PORT MAP(a, incVal, inc, incDecSel, result);
 END ARCHITECTURE;

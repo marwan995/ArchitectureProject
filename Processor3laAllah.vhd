@@ -142,8 +142,8 @@ ARCHITECTURE ArchProcessor OF Processor IS
     SIGNAL IF_ID_input : STD_LOGIC_VECTOR(64 DOWNTO 0) := (OTHERS => '0');
     SIGNAL IF_ID_output : STD_LOGIC_VECTOR(64 DOWNTO 0) := (OTHERS => '0');
 
-    SIGNAL ID_EX_input : STD_LOGIC_VECTOR(164 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL ID_EX_output : STD_LOGIC_VECTOR(164 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL ID_EX_input : STD_LOGIC_VECTOR(165 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL ID_EX_output : STD_LOGIC_VECTOR(165 DOWNTO 0) := (OTHERS => '0');
 
     SIGNAL EX_MEM_input : STD_LOGIC_VECTOR(194 DOWNTO 0) := (OTHERS => '0');
     SIGNAL EX_MEM_output : STD_LOGIC_VECTOR(194 DOWNTO 0) := (OTHERS => '0');
@@ -205,11 +205,17 @@ BEGIN
         ID_EX_input(117)
     );
 
+    -- forward instruction
+    ID_EX_input(133 DOWNTO 118) <= IF_ID_output(31 DOWNTO 16);
+
+    -- forward pc
+    ID_EX_input(165 DOWNTO 134) <= IF_ID_output(64 DOWNTO 33);
+
     -- 31:0 src1,       63:32 src2,     95:64 immediate(sign extended),
     -- 99:96 WB,       108:100 MEM,    116:109 ALU,    117 jmpFlag
     -- 133:118 instruction,      165:134 pc
     ID_EX : pipeLineReg GENERIC MAP(
-        165) PORT MAP(
+        166) PORT MAP(
         clock, rst, ID_EX_input, ID_EX_output
     );
 

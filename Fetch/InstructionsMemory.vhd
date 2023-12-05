@@ -14,10 +14,13 @@ END ENTITY instructionMemory;
 ARCHITECTURE Arch_instructionMemory OF instructionMemory IS 
     TYPE instructionMemory_type IS ARRAY(0 TO 4096) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL instructionMemory : instructionMemory_type := (
-        "0100000001000000",
-        "0100000001100000",
+        "0000000000000000",
+        "0100000000000000",
+        "0111100001000000",
+        "0101100001100000",
         "0100000001111001",
-        "1100000000001110",
+        "0100000000011000",
+        "1111100001101110",
         others => (others => '0')
     );
 BEGIN
@@ -31,3 +34,4 @@ BEGIN
     END PROCESS;
     dataout <= instructionMemory(to_integer(unsigned((address))));
 END Arch_instructionMemory;
+

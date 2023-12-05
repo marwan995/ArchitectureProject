@@ -163,7 +163,7 @@ ARCHITECTURE ArchProcessor OF Processor IS
 BEGIN
     PROCESS
     BEGIN
-        WAIT FOR 15 ns;
+        WAIT FOR 50 ps;
         clock <= NOT clock;
     END PROCESS;
 

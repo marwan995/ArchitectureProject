@@ -70,6 +70,7 @@ BEGIN
     (oneOperand AND (instruction(6) AND NOT instruction(5) AND NOT instruction(4) AND instruction(3))) OR
     (oneOperand AND (instruction(6)AND instruction(5) AND instruction(4) AND instruction(3)) AND instruction(0));
     -------------------------------Memory ----------------------------
+    readOrWrite<=(isJump or ( oneOperand and (instruction(1) nor instruction(2)) and (instruction(6) and (instruction(3) nand instruction(4)))) );
     memoryEnable <=
         (zeroOperand AND instruction(6))OR
         (oneOperand AND (instruction(6) AND instruction(5)))OR

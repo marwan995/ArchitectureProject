@@ -40,8 +40,8 @@ input_strings = ["0000000000000000",
 resulting_string = create_force_commands(input_strings)
 print(resulting_string)
 # vcom -work work -2002 -explicit -O0 {D:/3rd-cmp/First semster/Arch/project/Decode/ControlUnit.vhd}
-# # Model Technology ModelSim ALTERA vcom 10.1d Compiler 2012.11 Nov  2 2012
-# # -- Loading package STANDARD
+#  # Model Technology ModelSim ALTERA vcom 10.1d Compiler 2012.11 Nov  2 2012
+#  # -- Loading package STANDARD
 # # -- Loading package TEXTIO
 # # -- Loading package std_logic_1164
 # # -- Loading package NUMERIC_STD
@@ -56,7 +56,7 @@ print(resulting_string)
 # # Loading work.controlunit(archcontrolunit)
 # add wave -position insertpoint  \
 # sim:/controlunit/instruction \
-# sim:/controlunit/src2Selector \
+# sim:/controlunit/readOrWrite \
 # sim:/controlunit/zeroOperand \
 # sim:/controlunit/oneOperand \
 # sim:/controlunit/twoOperand \

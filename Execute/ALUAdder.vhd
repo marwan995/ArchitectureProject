@@ -46,8 +46,4 @@ BEGIN
     COUT <= '0' WHEN (s = "11" AND cin = '1')
         ELSE
         Carry;
-
-    testTemp <= temp;
-    testResult <= Result;
-    testB <= B;
 END ARCHITECTURE;

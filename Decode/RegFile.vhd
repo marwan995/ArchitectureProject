@@ -5,6 +5,7 @@ USE ieee.numeric_std.ALL;
 ENTITY RegFile IS
     PORT (
         clk : IN STD_LOGIC;
+        rst : IN STD_LOGIC;
 
         regNum1 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
         regNum2 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -203,14 +204,14 @@ BEGIN
     reg7WriteEnable <= ((writeBackReg1EnableList(7) AND writeBack1Enable) OR (writeBackReg2EnableList(7) AND writeBack2Enable));
 
     -- regs
-    reg0 : REG GENERIC MAP(32) PORT MAP(clk, reg0WriteEnable, '0', reg0MuxOutput, reg0Output);
-    reg1 : REG GENERIC MAP(32) PORT MAP(clk, reg1WriteEnable, '0', reg1MuxOutput, reg1Output);
-    reg2 : REG GENERIC MAP(32) PORT MAP(clk, reg2WriteEnable, '0', reg2MuxOutput, reg2Output);
-    reg3 : REG GENERIC MAP(32) PORT MAP(clk, reg3WriteEnable, '0', reg3MuxOutput, reg3Output);
-    reg4 : REG GENERIC MAP(32) PORT MAP(clk, reg4WriteEnable, '0', reg4MuxOutput, reg4Output);
-    reg5 : REG GENERIC MAP(32) PORT MAP(clk, reg5WriteEnable, '0', reg5MuxOutput, reg5Output);
-    reg6 : REG GENERIC MAP(32) PORT MAP(clk, reg6WriteEnable, '0', reg6MuxOutput, reg6Output);
-    reg7 : REG GENERIC MAP(32) PORT MAP(clk, reg7WriteEnable, '0', reg7MuxOutput, reg7Output);
+    reg0 : REG GENERIC MAP(32) PORT MAP(clk, reg0WriteEnable, rst, reg0MuxOutput, reg0Output);
+    reg1 : REG GENERIC MAP(32) PORT MAP(clk, reg1WriteEnable, rst, reg1MuxOutput, reg1Output);
+    reg2 : REG GENERIC MAP(32) PORT MAP(clk, reg2WriteEnable, rst, reg2MuxOutput, reg2Output);
+    reg3 : REG GENERIC MAP(32) PORT MAP(clk, reg3WriteEnable, rst, reg3MuxOutput, reg3Output);
+    reg4 : REG GENERIC MAP(32) PORT MAP(clk, reg4WriteEnable, rst, reg4MuxOutput, reg4Output);
+    reg5 : REG GENERIC MAP(32) PORT MAP(clk, reg5WriteEnable, rst, reg5MuxOutput, reg5Output);
+    reg6 : REG GENERIC MAP(32) PORT MAP(clk, reg6WriteEnable, rst, reg6MuxOutput, reg6Output);
+    reg7 : REG GENERIC MAP(32) PORT MAP(clk, reg7WriteEnable, rst, reg7MuxOutput, reg7Output);
 
     -- assign reg output to tristate input
     tristate0InputBus1 <= reg0Output;

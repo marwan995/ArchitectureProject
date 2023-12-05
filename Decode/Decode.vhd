@@ -41,6 +41,7 @@ ARCHITECTURE ArchDecode OF Decode IS
     COMPONENT RegFile IS
         PORT (
             clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
 
             regNum1 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
             regNum2 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -101,7 +102,7 @@ BEGIN
         immedateValue, immedateValueExtended
     );
 
-    regNum1 <= instruction(10 DOWNTO 8) WHEN (instruction(15) ='1' AND instruction(14) = '0') OR (instruction(15)='1' AND instruction(14) = '1')
+    regNum1 <= instruction(10 DOWNTO 8) WHEN (instruction(15) = '1' AND instruction(14) = '0') OR (instruction(15) = '1' AND instruction(14) = '1')
         ELSE
         instruction(13 DOWNTO 11)
         ;
@@ -112,7 +113,7 @@ BEGIN
         ;
 
     UpdateTheRegisters : RegFile PORT MAP(-- if 3 oprand  takes 2 , 3
-        clk, regNum1, regNum2,
+        clk, rst, regNum1, regNum2,
         writeBack1Enable, writeBack2Enable,
         writeBack1Address, writeBack2Address, writeBack1Data, writeBack2Data, reg1Value, reg2Value
     );

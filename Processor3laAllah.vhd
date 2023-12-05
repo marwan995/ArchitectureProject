@@ -237,6 +237,9 @@ BEGIN
         EX_MEM_input(95 DOWNTO 64)
     );
 
+    -- forward WB flags
+    EX_MEM_input(131 DOWNTO 128) <= ID_EX_output(99 DOWNTO 96);
+
     -- forward instruction
     EX_MEM_input(156 DOWNTO 141) <= ID_EX_output(133 DOWNTO 118);
 
@@ -267,12 +270,18 @@ BEGIN
         MEM_WB_input(95 DOWNTO 64)
     );
 
+    -- forward src1
+    MEM_WB_input(31 downto 0) <= EX_MEM_output(31 downto 0);
+
     -- forward src2
     MEM_WB_input(63 DOWNTO 32) <= EX_MEM_output(63 DOWNTO 32);
-
+    
+    -- forward alu output
+    MEM_WB_input(127 downto 96) <= EX_MEM_output(95 downto 64);
+    
     -- forward immediate
     MEM_WB_input(159 DOWNTO 128) <= EX_MEM_output(127 DOWNTO 96);
-
+    
     -- forward WB
     MEM_WB_input(163 DOWNTO 160) <= EX_MEM_output(131 DOWNTO 128);
 
@@ -281,6 +290,7 @@ BEGIN
 
     -- forward pc
     MEM_WB_input(211 DOWNTO 180) <= EX_MEM_output(188 DOWNTO 157);
+
 
     -- 31:0 src1,   63:32 src2,     95:64 mem,      127:96 alu,
     -- 159:128 immediate,    163:160 WB,       179:164 instruction,

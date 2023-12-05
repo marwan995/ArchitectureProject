@@ -13,7 +13,9 @@ END ENTITY protectedMemory;
 
 ARCHITECTURE Arch_protectedMemory OF protectedMemory IS TYPE protectedMemory_type
     IS ARRAY(0 TO 4096) OF STD_LOGIC;
-    SIGNAL protectedMemory : protectedMemory_type;
+    SIGNAL protectedMemory : protectedMemory_type:= (
+        others =>'0'
+    );
 BEGIN
     PROCESS (clk) IS
     BEGIN

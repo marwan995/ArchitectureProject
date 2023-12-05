@@ -13,7 +13,11 @@ END ENTITY dataMemory;
 
 ARCHITECTURE Arch_dataMemory OF dataMemory IS TYPE dataMemory_type
     IS ARRAY(0 TO 4096) OF STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL dataMemory : dataMemory_type;
+    SIGNAL dataMemory : dataMemory_type := (
+        "00000000000000000000000000011111",
+        "01000000000000000100000000000011",
+        others => (others => '0')
+    );
 BEGIN
     PROCESS (clk) IS
     BEGIN

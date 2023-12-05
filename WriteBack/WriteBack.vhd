@@ -35,23 +35,23 @@ ARCHITECTURE rtl OF WriteBack IS
             output : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
         );
     END COMPONENT Mux2;
-    SIGNAL regOrAluOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL immedateOrmemoryOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL regOrmemoryOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL immedateOraluOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL Mux4ValueOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL memorySelector : STD_LOGIC;
 
 BEGIN
-    regOrAlu : Mux2 GENERIC MAP(
+    regOrmemory : Mux2 GENERIC MAP(
         32) PORT MAP(
-        reg1Value, alu, writeBackSignals(0), regOrAluOut
+        reg1Value, memory, writeBackSignals(1), regOrmemoryOut
     );
-    immedateOrmemory : Mux2 GENERIC MAP(
+    immedateOralu : Mux2 GENERIC MAP(
         32) PORT MAP(
-        memory, immedate, writeBackSignals(0), immedateOrmemoryOut
+        alu, immedate, writeBackSignals(1), immedateOraluOut
     );
     Mux4Value : Mux2 GENERIC MAP(
         32) PORT MAP(
-        regOrAluOut, immedateOrmemoryOut, writeBackSignals(1), Mux4ValueOut
+        regOrmemoryOut, immedateOraluOut, writeBackSignals(0), Mux4ValueOut
     );
     writeBack1Value : Mux2 GENERIC MAP(
         32) PORT MAP(
@@ -64,12 +64,12 @@ BEGIN
     writeBack1Address <= instruction(13 DOWNTO 11);
     writeBack2Address <= instruction(10 DOWNTO 8);
     --- memory
-    memorySelector <= (instruction(1) xor instruction(2));
+    memorySelector <= (instruction(1) XOR instruction(2));
     memoryPcUpdate : Mux2 GENERIC MAP(
         32) PORT MAP(
         reg1Value, memory, memorySelector, memoryPc
     );
     ---- writeBack2Data
-    writeBack2Data <= reg2Value; 
+    writeBack2Data <= reg1Value;
 
 END ARCHITECTURE;

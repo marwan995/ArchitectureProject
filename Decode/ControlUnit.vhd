@@ -53,7 +53,7 @@ BEGIN
 
     -------------------------------Write Back ----------------------------
     writeBackEnable <=
-        (oneOperand AND (instruction(1) NOR instruction(2))) OR
+        (oneOperand AND(instruction(1)nor instruction(2))and(not(instruction(6)) or (not(instruction(5)) and instruction(0))or (instruction(3)and instruction(4)))) OR
         (twoOperand AND (instruction(2) NAND instruction(1)))OR
         (threeOperand);
 

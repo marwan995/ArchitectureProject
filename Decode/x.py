@@ -57,7 +57,7 @@ print(resulting_string)
 # # Loading work.controlunit(archcontrolunit)
 # add wave -position insertpoint  \
 # sim:/controlunit/instruction \
-# sim:/controlunit/readOrWrite \
+# sim:/controlunit/writeBackEnable \
 # sim:/controlunit/zeroOperand \
 # sim:/controlunit/oneOperand \
 # sim:/controlunit/twoOperand \

@@ -26,7 +26,7 @@ END RegFile;
 
 ARCHITECTURE ArchRegFile OF RegFile IS
 
-    COMPONENT REG IS
+    COMPONENT RegFileREG IS
         GENERIC (n : INTEGER := 32);
         PORT (
             clk : IN STD_LOGIC;
@@ -35,7 +35,7 @@ ARCHITECTURE ArchRegFile OF RegFile IS
             inData : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
             outData : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
         );
-    END COMPONENT REG;
+    END COMPONENT RegFileREG;
 
     COMPONENT TriStateBuffer IS
         GENERIC (
@@ -145,23 +145,23 @@ BEGIN
     writeBack2Reg : RegDecode PORT MAP(writeBack2Num, writeBackReg2EnableList);
 
     -- tristate0EnableBus1 <= buffer1EnableList(0) AND NOT(writeBackReg1EnableList(0) OR writeBackReg2EnableList(0));
-    tristate0EnableBus1 <= buffer1EnableList(0) AND NOT(writeBack1Enable);
-    tristate1EnableBus1 <= buffer1EnableList(1) AND NOT(writeBack1Enable);
-    tristate2EnableBus1 <= buffer1EnableList(2) AND NOT(writeBack1Enable);
-    tristate3EnableBus1 <= buffer1EnableList(3) AND NOT(writeBack1Enable);
-    tristate4EnableBus1 <= buffer1EnableList(4) AND NOT(writeBack1Enable);
-    tristate5EnableBus1 <= buffer1EnableList(5) AND NOT(writeBack1Enable);
-    tristate6EnableBus1 <= buffer1EnableList(6) AND NOT(writeBack1Enable);
-    tristate7EnableBus1 <= buffer1EnableList(7) AND NOT(writeBack1Enable);
+    tristate0EnableBus1 <= buffer1EnableList(0) AND NOT(clk);
+    tristate1EnableBus1 <= buffer1EnableList(1) AND NOT(clk);
+    tristate2EnableBus1 <= buffer1EnableList(2) AND NOT(clk);
+    tristate3EnableBus1 <= buffer1EnableList(3) AND NOT(clk);
+    tristate4EnableBus1 <= buffer1EnableList(4) AND NOT(clk);
+    tristate5EnableBus1 <= buffer1EnableList(5) AND NOT(clk);
+    tristate6EnableBus1 <= buffer1EnableList(6) AND NOT(clk);
+    tristate7EnableBus1 <= buffer1EnableList(7) AND NOT(clk);
 
-    tristate0EnableBus2 <= buffer2EnableList(0) AND NOT(writeBack2Enable);
-    tristate1EnableBus2 <= buffer2EnableList(1) AND NOT(writeBack2Enable);
-    tristate2EnableBus2 <= buffer2EnableList(2) AND NOT(writeBack2Enable);
-    tristate3EnableBus2 <= buffer2EnableList(3) AND NOT(writeBack2Enable);
-    tristate4EnableBus2 <= buffer2EnableList(4) AND NOT(writeBack2Enable);
-    tristate5EnableBus2 <= buffer2EnableList(5) AND NOT(writeBack2Enable);
-    tristate6EnableBus2 <= buffer2EnableList(6) AND NOT(writeBack2Enable);
-    tristate7EnableBus2 <= buffer2EnableList(7) AND NOT(writeBack2Enable);
+    tristate0EnableBus2 <= buffer2EnableList(0) AND NOT(clk);
+    tristate1EnableBus2 <= buffer2EnableList(1) AND NOT(clk);
+    tristate2EnableBus2 <= buffer2EnableList(2) AND NOT(clk);
+    tristate3EnableBus2 <= buffer2EnableList(3) AND NOT(clk);
+    tristate4EnableBus2 <= buffer2EnableList(4) AND NOT(clk);
+    tristate5EnableBus2 <= buffer2EnableList(5) AND NOT(clk);
+    tristate6EnableBus2 <= buffer2EnableList(6) AND NOT(clk);
+    tristate7EnableBus2 <= buffer2EnableList(7) AND NOT(clk);
 
     -- tristates for bus 1
     tristate0bus1 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate0EnableBus1, tristate0InputBus1, dataBus1);
@@ -204,14 +204,14 @@ BEGIN
     reg7WriteEnable <= ((writeBackReg1EnableList(7) AND writeBack1Enable) OR (writeBackReg2EnableList(7) AND writeBack2Enable));
 
     -- regs
-    reg0 : REG GENERIC MAP(32) PORT MAP(clk, reg0WriteEnable, rst, reg0MuxOutput, reg0Output);
-    reg1 : REG GENERIC MAP(32) PORT MAP(clk, reg1WriteEnable, rst, reg1MuxOutput, reg1Output);
-    reg2 : REG GENERIC MAP(32) PORT MAP(clk, reg2WriteEnable, rst, reg2MuxOutput, reg2Output);
-    reg3 : REG GENERIC MAP(32) PORT MAP(clk, reg3WriteEnable, rst, reg3MuxOutput, reg3Output);
-    reg4 : REG GENERIC MAP(32) PORT MAP(clk, reg4WriteEnable, rst, reg4MuxOutput, reg4Output);
-    reg5 : REG GENERIC MAP(32) PORT MAP(clk, reg5WriteEnable, rst, reg5MuxOutput, reg5Output);
-    reg6 : REG GENERIC MAP(32) PORT MAP(clk, reg6WriteEnable, rst, reg6MuxOutput, reg6Output);
-    reg7 : REG GENERIC MAP(32) PORT MAP(clk, reg7WriteEnable, rst, reg7MuxOutput, reg7Output);
+    reg0 : RegFileREG GENERIC MAP(32) PORT MAP(clk, reg0WriteEnable, rst, reg0MuxOutput, reg0Output);
+    reg1 : RegFileREG GENERIC MAP(32) PORT MAP(clk, reg1WriteEnable, rst, reg1MuxOutput, reg1Output);
+    reg2 : RegFileREG GENERIC MAP(32) PORT MAP(clk, reg2WriteEnable, rst, reg2MuxOutput, reg2Output);
+    reg3 : RegFileREG GENERIC MAP(32) PORT MAP(clk, reg3WriteEnable, rst, reg3MuxOutput, reg3Output);
+    reg4 : RegFileREG GENERIC MAP(32) PORT MAP(clk, reg4WriteEnable, rst, reg4MuxOutput, reg4Output);
+    reg5 : RegFileREG GENERIC MAP(32) PORT MAP(clk, reg5WriteEnable, rst, reg5MuxOutput, reg5Output);
+    reg6 : RegFileREG GENERIC MAP(32) PORT MAP(clk, reg6WriteEnable, rst, reg6MuxOutput, reg6Output);
+    reg7 : RegFileREG GENERIC MAP(32) PORT MAP(clk, reg7WriteEnable, rst, reg7MuxOutput, reg7Output);
 
     -- assign reg output to tristate input
     tristate0InputBus1 <= reg0Output;

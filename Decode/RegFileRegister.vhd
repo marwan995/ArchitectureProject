@@ -2,7 +2,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 
-ENTITY REG IS
+ENTITY RegFileREG IS
     GENERIC (n : INTEGER := 32);
     PORT (
         clk : IN STD_LOGIC;
@@ -11,17 +11,18 @@ ENTITY REG IS
         inData : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
         outData : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
     );
-END REG;
+END RegFileREG;
 
-ARCHITECTURE ArchREG OF REG IS
+ARCHITECTURE ArchRegFileREG OF RegFileREG IS
     SIGNAL reg : STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
 BEGIN
-    PROCESS (clk, rst)
+
+    PROCESS (clk, en, rst)
     BEGIN
         IF rst = '1' THEN
             reg <= (OTHERS => '0');
-        ELSIF rising_edge(clk) THEN
-            IF en = '1' THEN
+        ELSIF en = '1' THEN
+            IF falling_edge(clk) THEN
                 reg <= inData;
 
             END IF;

@@ -12,10 +12,7 @@ ENTITY Processor IS
         assemblerPC : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         inttrupt : IN STD_LOGIC;
-        outPort : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-
-        reg1Test: out std_logic_vector(2 downto 0);
-        reg2Test: out std_logic_vector(2 downto 0)
+        outPort : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
 END Processor;
 
@@ -65,12 +62,10 @@ ARCHITECTURE ArchProcessor OF Processor IS
             writeBack : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             memory : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
             alu : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            jmpFlag : OUT STD_LOGIC;
-
-            reg1Test: out std_logic_vector(2 downto 0);
-            reg2Test: out std_logic_vector(2 downto 0)
+            jmpFlag : OUT STD_LOGIC
             -- instructionOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             -- pcOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+
         );
     END COMPONENT Decode;
     COMPONENT Execute IS
@@ -166,10 +161,12 @@ ARCHITECTURE ArchProcessor OF Processor IS
     SIGNAL writeBack2DataSig : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL memoryPcSig : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
+    -- SIGNAL regClock : STD_LOGIC;
+
 BEGIN
     PROCESS
     BEGIN
-        WAIT FOR 50 ps;
+        WAIT FOR 50 ns;
         clock <= NOT clock;
     END PROCESS;
 
@@ -208,9 +205,7 @@ BEGIN
         ID_EX_input(99 DOWNTO 96),
         ID_EX_input(108 DOWNTO 100),
         ID_EX_input(116 DOWNTO 109),
-        ID_EX_input(117),
-        reg1Test,
-        reg2Test
+        ID_EX_input(117)
     );
 
     -- forward instruction
@@ -245,11 +240,23 @@ BEGIN
         EX_MEM_input(95 DOWNTO 64)
     );
 
+    -- forward src1
+    EX_MEM_input(31 DOWNTO 0) <= ID_EX_output(31 DOWNTO 0);
+
+    -- forward src2
+    EX_MEM_input(63 DOWNTO 32) <= ID_EX_output(63 DOWNTO 32);
+
+    -- forward immediate
+    EX_MEM_input(127 DOWNTO 96) <= ID_EX_output(95 DOWNTO 64);
+
     -- forward WB flags
     EX_MEM_input(131 DOWNTO 128) <= ID_EX_output(99 DOWNTO 96);
 
     -- forward instruction
     EX_MEM_input(156 DOWNTO 141) <= ID_EX_output(133 DOWNTO 118);
+
+    -- forward mem
+    EX_MEM_input(140 DOWNTO 132) <= ID_EX_output(108 DOWNTO 100);
 
     -- forward pc
     EX_MEM_input(188 DOWNTO 157) <= ID_EX_output(165 DOWNTO 134);
@@ -279,17 +286,17 @@ BEGIN
     );
 
     -- forward src1
-    MEM_WB_input(31 downto 0) <= EX_MEM_output(31 downto 0);
+    MEM_WB_input(31 DOWNTO 0) <= EX_MEM_output(31 DOWNTO 0);
 
     -- forward src2
     MEM_WB_input(63 DOWNTO 32) <= EX_MEM_output(63 DOWNTO 32);
-    
+
     -- forward alu output
-    MEM_WB_input(127 downto 96) <= EX_MEM_output(95 downto 64);
-    
+    MEM_WB_input(127 DOWNTO 96) <= EX_MEM_output(95 DOWNTO 64);
+
     -- forward immediate
     MEM_WB_input(159 DOWNTO 128) <= EX_MEM_output(127 DOWNTO 96);
-    
+
     -- forward WB
     MEM_WB_input(163 DOWNTO 160) <= EX_MEM_output(131 DOWNTO 128);
 
@@ -298,8 +305,6 @@ BEGIN
 
     -- forward pc
     MEM_WB_input(211 DOWNTO 180) <= EX_MEM_output(188 DOWNTO 157);
-
-
     -- 31:0 src1,   63:32 src2,     95:64 mem,      127:96 alu,
     -- 159:128 immediate,    163:160 WB,       179:164 instruction,
     -- 211:180 pc

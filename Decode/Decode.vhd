@@ -24,10 +24,10 @@ ENTITY Decode IS
         writeBack : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
         memory : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
         alu : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-        jmpFlag : OUT STD_LOGIC;
+        jmpFlag : OUT STD_LOGIC
 
-        reg1Test: out std_logic_vector(2 downto 0);
-        reg2Test: out std_logic_vector(2 downto 0)
+        -- reg1Test: out std_logic_vector(2 downto 0);
+        -- reg2Test: out std_logic_vector(2 downto 0)
         -- instructionOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         -- pcOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 
@@ -114,9 +114,6 @@ BEGIN
         ELSE
         instruction(10 DOWNTO 8)
         ;
-
-    reg1Test <= regNum1;
-    reg2Test <= regNum2;
 
     UpdateTheRegisters : RegFile PORT MAP(-- if 3 oprand  takes 2 , 3
         clk, rst, regNum1, regNum2,

@@ -12,6 +12,8 @@ ENTITY testBench IS
 
         inputPort : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
+        currentInstruction : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+
         pc : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         outputPort : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         memoryOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -40,6 +42,8 @@ ARCHITECTURE archTestBench OF testBench IS
             assemblerInstruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
             assemblerPC : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
+            currentInstruction : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+
             inttrupt : IN STD_LOGIC;
             outPort : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             memoryOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -65,6 +69,7 @@ BEGIN
         writeInstructionEnable,
         instruction,
         instructionPc,
+        currentInstruction,
         '0',
         outputPort,
         memoryOut,

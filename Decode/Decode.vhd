@@ -24,7 +24,16 @@ ENTITY Decode IS
         writeBack : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
         memory : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
         alu : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-        jmpFlag : OUT STD_LOGIC
+        jmpFlag : OUT STD_LOGIC;
+
+        register0 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register3 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register4 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register5 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register6 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 
         -- reg1Test: out std_logic_vector(2 downto 0);
         -- reg2Test: out std_logic_vector(2 downto 0)
@@ -59,7 +68,16 @@ ARCHITECTURE ArchDecode OF Decode IS
             writeBack2Data : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
             dataBus1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            dataBus2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+            dataBus2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+            register0 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register3 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register4 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register5 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register6 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT;
     COMPONENT ControlUnit IS
@@ -118,7 +136,15 @@ BEGIN
     UpdateTheRegisters : RegFile PORT MAP(-- if 3 oprand  takes 2 , 3
         clk, rst, regNum1, regNum2,
         writeBack1Enable, writeBack2Enable,
-        writeBack1Address, writeBack2Address, writeBack1Data, writeBack2Data, reg1Value, reg2Value
+        writeBack1Address, writeBack2Address, writeBack1Data, writeBack2Data, reg1Value, reg2Value,
+        register0,
+        register1,
+        register2,
+        register3,
+        register4,
+        register5,
+        register6,
+        register7
     );
 
     CreateControlSignals : ControlUnit PORT MAP(

@@ -20,7 +20,16 @@ ENTITY RegFile IS
         writeBack2Data : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         dataBus1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-        dataBus2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        dataBus2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+        register0 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register3 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register4 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register5 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register6 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
 END RegFile;
 
@@ -212,6 +221,16 @@ BEGIN
     reg5 : RegFileREG GENERIC MAP(32) PORT MAP(clk, reg5WriteEnable, rst, reg5MuxOutput, reg5Output);
     reg6 : RegFileREG GENERIC MAP(32) PORT MAP(clk, reg6WriteEnable, rst, reg6MuxOutput, reg6Output);
     reg7 : RegFileREG GENERIC MAP(32) PORT MAP(clk, reg7WriteEnable, rst, reg7MuxOutput, reg7Output);
+
+    -- output regs
+    register0 <= reg0Output;
+    register1 <= reg1Output;
+    register2 <= reg2Output;
+    register3 <= reg3Output;
+    register4 <= reg4Output;
+    register5 <= reg5Output;
+    register6 <= reg6Output;
+    register7 <= reg7Output;
 
     -- assign reg output to tristate input
     tristate0InputBus1 <= reg0Output;

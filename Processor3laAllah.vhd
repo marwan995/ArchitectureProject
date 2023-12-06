@@ -4,6 +4,7 @@ USE ieee.numeric_std.ALL;
 
 ENTITY Processor IS
     PORT (
+        clk : OUT STD_LOGIC;
         rst : IN STD_LOGIC;
         inputPort : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
@@ -12,7 +13,19 @@ ENTITY Processor IS
         assemblerPC : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         inttrupt : IN STD_LOGIC;
-        outPort : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        outPort : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        memoryOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        pcOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        flags : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+
+        register0 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register3 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register4 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register5 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register6 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
 END Processor;
 
@@ -62,9 +75,16 @@ ARCHITECTURE ArchProcessor OF Processor IS
             writeBack : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             memory : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
             alu : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            jmpFlag : OUT STD_LOGIC
-            -- instructionOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            -- pcOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+            jmpFlag : OUT STD_LOGIC;
+
+            register0 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register3 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register4 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register5 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register6 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 
         );
     END COMPONENT Decode;
@@ -161,6 +181,8 @@ ARCHITECTURE ArchProcessor OF Processor IS
     SIGNAL writeBack2DataSig : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL memoryPcSig : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
+    SIGNAL notClk : STD_LOGIC;
+
     -- SIGNAL regClock : STD_LOGIC;
 
 BEGIN
@@ -170,6 +192,13 @@ BEGIN
         clock <= NOT clock;
     END PROCESS;
 
+    clk <= clock;
+
+    notClk <= NOT(clock);
+
+    pcOut <= IF_ID_output(64 DOWNTO 33);
+    flags <= EX_MEM_output(193 DOWNTO 190);
+    memoryOut <= MEM_WB_output(95 DOWNTO 64);
     ----------------- Fetching -----------------------------
 
     Fetching : Fetch PORT MAP(
@@ -182,7 +211,7 @@ BEGIN
     -- 15 : 0  immidate ,  31 :16 instruction , 32 freeze(imm) , 64 :33 PC 
     IF_ID : PipeLineReg GENERIC MAP(
         65) PORT MAP(
-        clock, rst, IF_ID_input, IF_ID_output
+        notclk, rst, IF_ID_input, IF_ID_output
     );
 
     ----------------- Decoding ----------------------------
@@ -205,7 +234,16 @@ BEGIN
         ID_EX_input(99 DOWNTO 96),
         ID_EX_input(108 DOWNTO 100),
         ID_EX_input(116 DOWNTO 109),
-        ID_EX_input(117)
+        ID_EX_input(117),
+
+        register0,
+        register1,
+        register2,
+        register3,
+        register4,
+        register5,
+        register6,
+        register7
     );
 
     -- forward instruction

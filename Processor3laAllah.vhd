@@ -12,6 +12,8 @@ ENTITY Processor IS
         assemblerInstruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         assemblerPC : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
+        currentInstruction : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+
         inttrupt : IN STD_LOGIC;
         outPort : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         memoryOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -183,8 +185,6 @@ ARCHITECTURE ArchProcessor OF Processor IS
 
     SIGNAL notClk : STD_LOGIC;
 
-    -- SIGNAL regClock : STD_LOGIC;
-
 BEGIN
     PROCESS
     BEGIN
@@ -197,6 +197,7 @@ BEGIN
     notClk <= NOT(clock);
 
     pcOut <= IF_ID_output(64 DOWNTO 33);
+    currentInstruction <= IF_ID_output(31 DOWNTO 16);
     flags <= EX_MEM_output(193 DOWNTO 190);
     memoryOut <= MEM_WB_output(95 DOWNTO 64);
     ----------------- Fetching -----------------------------

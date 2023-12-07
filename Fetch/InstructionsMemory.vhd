@@ -15,24 +15,25 @@ END ENTITY instructionMemory;
 ARCHITECTURE Arch_instructionMemory OF instructionMemory IS
     TYPE instructionMemory_type IS ARRAY(0 TO 4096) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
 
-    FUNCTION load_memory_from_file(file_name: IN STRING) RETURN instructionMemory_type IS
-    FILE file_string: TEXT OPEN READ_MODE IS file_name;
-    VARIABLE line: LINE;
-    VARIABLE bv: BIT_VECTOR(15 DOWNTO 0);
-    VARIABLE memory: instructionMemory_type;
-    VARIABLE idx: INTEGER := 0;
-BEGIN
-    WHILE idx < instructionMemory_type'LENGTH AND NOT ENDFILE(file_string) LOOP
-        READLINE(file_string, line);
-        READ(line, bv);
-        memory(idx) := TO_STDLOGICVECTOR(bv);
-        idx := idx + 1;
-    END LOOP;
+    FUNCTION load_memory_from_file(file_name : IN STRING) RETURN instructionMemory_type IS
+        FILE file_string : TEXT OPEN READ_MODE IS file_name;
+        VARIABLE line : LINE;
+        VARIABLE bv : BIT_VECTOR(15 DOWNTO 0);
+        VARIABLE memory : instructionMemory_type;
+        VARIABLE idx : INTEGER := 0;
+    BEGIN
+        memory := (OTHERS => (OTHERS => '0'));
+        WHILE idx < instructionMemory_type'LENGTH AND NOT ENDFILE(file_string) LOOP
+            READLINE(file_string, line);
+            READ(line, bv);
+            memory(idx) := TO_STDLOGICVECTOR(bv);
+            idx := idx + 1;
+        END LOOP;
 
-    RETURN memory;
-END FUNCTION;
+        RETURN memory;
+    END FUNCTION;
 
-    SIGNAL instructionMemory : instructionMemory_type := load_memory_from_file("D:/3rd-cmp/First semster/Arch/project/Fetch/codes.txt") ;
+    SIGNAL instructionMemory : instructionMemory_type := load_memory_from_file("D:/Study/CMP3/Architecture/Project/code/Fetch/codes.txt");
 BEGIN
     PROCESS (clk) IS
     BEGIN

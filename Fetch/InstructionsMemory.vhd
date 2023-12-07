@@ -1,6 +1,7 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.numeric_std.ALL;
+USE std.textio.ALL;
 
 ENTITY instructionMemory IS
     PORT (
@@ -13,31 +14,25 @@ END ENTITY instructionMemory;
 
 ARCHITECTURE Arch_instructionMemory OF instructionMemory IS
     TYPE instructionMemory_type IS ARRAY(0 TO 4096) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
-    SIGNAL instructionMemory : instructionMemory_type := (
-        -- "0000000000000000",
-        -- "0000000000000000",
-        "0100000000000000", -- not reg0
-        "0000000000000000",
-        "0000000000000000",
-        "0100000000011000", -- dec
-        "0000000000000000",
-        "0000000000000000",
 
-        "0100000001000000", -- out
-        -- "0000000000000000",
-        "0101100001100000", -- protect
-        -- "0111100001000000", -- out reg7
-        -- "0101100001100000", -- protect location at reg3
-        -- "0100000001111001", -- load location 
-        -- "0100000000011000", -- dec reg0
-        -- "0000000000000000",
-        "1111100000101110", -- or
-        -- "0000000000000000",
-        -- "0100000000011000", -- 
-        -- "0100000001000000", -- out
-        -- "1111100001101110", -- or
-        OTHERS => (OTHERS => '0')
-    );
+    FUNCTION load_memory_from_file(file_name: IN STRING) RETURN instructionMemory_type IS
+    FILE file_string: TEXT OPEN READ_MODE IS file_name;
+    VARIABLE line: LINE;
+    VARIABLE bv: BIT_VECTOR(15 DOWNTO 0);
+    VARIABLE memory: instructionMemory_type;
+    VARIABLE idx: INTEGER := 0;
+BEGIN
+    WHILE idx < instructionMemory_type'LENGTH AND NOT ENDFILE(file_string) LOOP
+        READLINE(file_string, line);
+        READ(line, bv);
+        memory(idx) := TO_STDLOGICVECTOR(bv);
+        idx := idx + 1;
+    END LOOP;
+
+    RETURN memory;
+END FUNCTION;
+
+    SIGNAL instructionMemory : instructionMemory_type := load_memory_from_file("D:/3rd-cmp/First semster/Arch/project/Fetch/codes.txt") ;
 BEGIN
     PROCESS (clk) IS
     BEGIN

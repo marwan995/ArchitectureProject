@@ -1,7 +1,3 @@
-lol R1
-nop
-nop 
-dec R1
-nop
-protect R2
-out r1
+sub R1 R2 R3
+LDM R4 FFh
+JMP R7

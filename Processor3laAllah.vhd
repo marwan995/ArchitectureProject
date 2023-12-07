@@ -197,7 +197,7 @@ BEGIN
     notClk <= NOT(clock);
 
     pcOut <= IF_ID_output(64 DOWNTO 33);
-    currentInstruction <= IF_ID_output(31 DOWNTO 16);
+    currentInstruction <= IF_ID_input(31 DOWNTO 16);
     flags <= EX_MEM_output(193 DOWNTO 190);
     memoryOut <= MEM_WB_output(95 DOWNTO 64);
     ----------------- Fetching -----------------------------

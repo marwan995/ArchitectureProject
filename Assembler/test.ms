@@ -1,3 +1,1 @@
-sub R1 R2 R3
-LDM R4 FFh
-JMP R7
+call r1

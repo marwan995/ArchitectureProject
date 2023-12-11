@@ -41,7 +41,7 @@ instructions_map = {
 
 def read_instruction_file():
     if len(sys.argv) < 2:
-        print(f"Error : please provide the path for the instructions file\nline of instruction --> {line_number} : {current_instruction}")
+        print(f"Error : please provide the path for the instructions file")
         sys.exit(0)
     instruction_path = sys.argv[1]
     with open(instruction_path, "r") as instruction_file:
@@ -126,8 +126,7 @@ def immediate_to_binary(instruction:str,immediate_value:str,is_immediate:int,is_
                 print(f"Error : invalid address\nline of instruction --> {line_number} : {current_instruction}")
                 exit(0) 
             ea_bits = format(immediate_int >> 16, "04b")
-            instruction = instruction[:4] + ea_bits + instruction[8:]
-            
+            instruction = instruction[:5] + ea_bits + instruction[9:]
             immediate_int &= 0xFFFF
         binary_representation = format(immediate_int, "016b")
 
@@ -156,4 +155,3 @@ def process_instruction_file():
 if __name__ == "__main__":
     # Call the main function
     process_instruction_file()
-

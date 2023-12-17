@@ -7,7 +7,7 @@ ENTITY ALU IS
         enable : IN STD_LOGIC;
         a : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         b : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-        carryFlag : IN STD_LOGIC;
+        flagRegBuffer : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 
         operationSel : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 
@@ -60,17 +60,30 @@ ARCHITECTURE ARCHALU OF ALU IS
         );
     END COMPONENT ALUXOR;
 
+    COMPONENT RCR IS
+        PORT (
+            reg : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            amount : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            carry : IN STD_LOGIC;
+            rotated : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            carryOut : OUT STD_LOGIC
+        );
+    END COMPONENT RCR;
+
     SIGNAL notOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL adderOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL andOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL orOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL xorOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL rcrOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+    SIGNAL adderCarryOut : STD_LOGIC;
+    SIGNAL rcrCarryOut : STD_LOGIC;
 
     SIGNAL adderIn1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL adderCin : STD_LOGIC;
     SIGNAL adderOperationSel : STD_LOGIC_VECTOR(1 DOWNTO 0);
     SIGNAL resultTemp : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL flagRegBuffer : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";
 
 BEGIN
     -- 0001 not
@@ -86,11 +99,11 @@ BEGIN
     -- 1101 xor
 
     NotOperation : ALUNOT PORT MAP(a, notOutput);
-    RCROperation : RCR
+    RCROperation : RCR PORT MAP(a, b, carryFlag, rcrOutput, rcrCarryOut);
     AndOperation : ALUAND PORT MAP(a, b, andOutput);
     OrOperation : ALUOR PORT MAP(a, b, orOutput);
     XorOperation : ALUXOR PORT MAP(a, b, xorOutput);
-    AdderOperations : ALUADDER PORT MAP(adderIn1, b, adderCin, adderOperationSel, adderOutput, flagRegBuffer(2));
+    AdderOperations : ALUADDER PORT MAP(adderIn1, b, adderCin, adderOperationSel, adderOutput, adderCarryOut);
 
     AdderOperationSel <= "11" WHEN operationSel = "0100" -- dec
         ELSE
@@ -117,6 +130,7 @@ BEGIN
         ELSE
         a
         ;
+
     resultTemp <= (OTHERS => '0') WHEN enable = '0'
         ELSE
         notOutput WHEN operationSel = "0001" -- not
@@ -129,15 +143,19 @@ BEGIN
         ELSE
         xorOutput WHEN operationSel = "1101" -- xor
         ELSE
+        rcrOutput WHEN operationSel = "0111" -- rcr
+        ELSE
         (OTHERS => 'Z');
 
     result <= resultTemp;
 
-    flagReg <= flagRegBuffer WHEN enable = '0'
-        ELSE
-        (flagRegBuffer(3 DOWNTO 1) & '1') WHEN
-        resultTemp = "00000000000000000000000000000000"
-        ELSE
-        (OTHERS => '0');
+    flagReg(2) <= flagRegBuffer(2) WHEN
+
+    -- flagReg <= flagRegBuffer WHEN enable = '0'
+    --     ELSE
+    --     (flagRegBuffer(3 DOWNTO 1) & '1') WHEN
+    --     resultTemp = "00000000000000000000000000000000"
+    --     ELSE
+    --     (OTHERS => '0');
 
 END ARCHITECTURE;

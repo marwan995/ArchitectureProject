@@ -70,6 +70,16 @@ ARCHITECTURE ARCHALU OF ALU IS
         );
     END COMPONENT RCR;
 
+    COMPONENT RCL IS
+        PORT (
+            reg : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            amount : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            carry : IN STD_LOGIC;
+            rotated : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            carryOut : OUT STD_LOGIC
+        );
+    END COMPONENT RCL;
+
     SIGNAL notOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL adderOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL andOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -79,6 +89,7 @@ ARCHITECTURE ARCHALU OF ALU IS
 
     SIGNAL adderCarryOut : STD_LOGIC;
     SIGNAL rcrCarryOut : STD_LOGIC;
+    SIGNAL rclCarryOut : STD_LOGIC;
 
     SIGNAL adderIn1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL adderCin : STD_LOGIC;
@@ -99,7 +110,8 @@ BEGIN
     -- 1101 xor
 
     NotOperation : ALUNOT PORT MAP(a, notOutput);
-    RCROperation : RCR PORT MAP(a, b, carryFlag, rcrOutput, rcrCarryOut);
+    RCROperation : RCR PORT MAP(a, b, flagRegBuffer(2), rcrOutput, rcrCarryOut);
+    RCLOperation : RCL PORT MAP(a, b, flagRegBuffer(2), rcrOutput, rcrCarryOut);
     AndOperation : ALUAND PORT MAP(a, b, andOutput);
     OrOperation : ALUOR PORT MAP(a, b, orOutput);
     XorOperation : ALUXOR PORT MAP(a, b, xorOutput);
@@ -149,13 +161,24 @@ BEGIN
 
     result <= resultTemp;
 
-    flagReg(2) <= flagRegBuffer(2) WHEN
+    -- negative flag
+    flagReg(1) <= flagRegBuffer(1) WHEN enable = '0'
+ELSE
+    resultTemp(31);
 
-    -- flagReg <= flagRegBuffer WHEN enable = '0'
-    --     ELSE
-    --     (flagRegBuffer(3 DOWNTO 1) & '1') WHEN
-    --     resultTemp = "00000000000000000000000000000000"
-    --     ELSE
-    --     (OTHERS => '0');
+    -- carry flag
+    flagReg(2) <= flagRegBuffer(2) WHEN enable = '0'
+ELSE
+    rcrCarryOut WHEN operationSel = "0111"
+ELSE
+    rclCarryOut WHEN operationSel = "0110"
+ELSE
+    adderCarryOut -- till other is stated
+    ;
+
+    flagReg(0) <= flagRegBuffer(0) WHEN enable = '0'
+ELSE
+    '1' WHEN resultTemp = "00000000000000000000000000000000"
+    ;
 
 END ARCHITECTURE;

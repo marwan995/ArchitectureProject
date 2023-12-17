@@ -20,7 +20,9 @@ BEGIN
     to_rotate <= reg & carry;
     amount_int <= to_integer(unsigned(amount));
 
-    rotated_vector <= to_rotate(amount_int - 1 DOWNTO 0) & reg(31 DOWNTO amount_int);
+    rotated_vector <= (OTHERS => '0') WHEN amount_int = 0
+        ELSE
+        to_rotate(amount_int - 1 DOWNTO 0) & reg(31 DOWNTO amount_int);
 
     rotated <= rotated_vector(32 DOWNTO 1);
     carryOut <= rotated_vector(0);

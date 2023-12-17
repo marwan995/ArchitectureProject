@@ -26,7 +26,8 @@ ENTITY testBench IS
         register4 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         register5 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         register6 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-        register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        protectionFlag : OUT STD_LOGIC
     );
 END testBench;
 
@@ -57,7 +58,8 @@ ARCHITECTURE archTestBench OF testBench IS
             register4 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             register5 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             register6 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+            register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            protectFlag : OUT STD_LOGIC
         );
     END COMPONENT Processor;
 BEGIN
@@ -82,7 +84,8 @@ BEGIN
         register4,
         register5,
         register6,
-        register7
+        register7,
+        protectionFlag
     );
 
 END ARCHITECTURE;

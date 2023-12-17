@@ -19,6 +19,7 @@ ENTITY Processor IS
         memoryOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         pcOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         flags : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        protectFlag : OUT STD_LOGIC;
 
         register0 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         register1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -124,7 +125,8 @@ ARCHITECTURE ArchProcessor OF Processor IS
             inputPort : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
             outputPort : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
 
-            memoryOut : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+            memoryOut : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
+            protectionFlag : OUT STD_LOGIC
 
         );
     END COMPONENT Memory;
@@ -321,7 +323,8 @@ BEGIN
         EX_MEM_output(188 DOWNTO 157),
         inputPort,
         outPort,
-        MEM_WB_input(95 DOWNTO 64)
+        MEM_WB_input(95 DOWNTO 64),
+        protectFlag
     );
 
     -- forward src1

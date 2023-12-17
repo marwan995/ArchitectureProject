@@ -18,7 +18,8 @@ ENTITY Memory IS
         inputPort : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
         outputPort : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
 
-        memoryOut : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+        memoryOut : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
+        protectionFlag : OUT STD_LOGIC
 
     );
 END Memory;
@@ -204,6 +205,8 @@ BEGIN
     protectedMemo : protectedMemory PORT MAP(
         clk, MemorySignals(1), MemorySignals(8), memoryAddress(11 DOWNTO 0), protectedMemoryDataIn, memoryProtectOut
     );
+
+    protectionFlag <= memoryProtectOut;
 
     ---------------I/O -----------------------------
     IoEnable <= (MemorySignals(8) AND MemorySignals(7));

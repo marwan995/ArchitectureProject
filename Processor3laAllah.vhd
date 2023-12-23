@@ -220,12 +220,6 @@ BEGIN
         IF_ID_input(64 DOWNTO 33)
     );
 
-    -- mux to forward a nop when there's an immediate instruction
-
-    -- ImmediateInstruction : Mux2 PORT MAP(
-    --     IF_ID_input(31 downto 16), (others => '0') , freeze, instructionMuxOut
-    -- );
-
     -- 15 : 0  immidate ,  31 :16 instruction , 32 freeze(imm) , 64 :33 PC 
     IF_ID : PipeLineReg GENERIC MAP(
         65) PORT MAP(

@@ -124,20 +124,33 @@ BEGIN
         immedateValue, immedateValueExtended
     );
 
-    regNum1 <= instruction(10 DOWNTO 8) WHEN (instruction(15) = '1' AND instruction(14) = '0') OR (instruction(15) = '1' AND instruction(14) = '1')
+    regNum1 <= instruction(10 DOWNTO 8) WHEN (instruction(15) = '1' AND instruction(14) = '0')
+        OR
+        (instruction(15) = '1' AND instruction(14) = '1')
         ELSE
         instruction(13 DOWNTO 11)
         ;
 
-    regNum2 <= instruction(7 DOWNTO 5) WHEN (instruction(15) = '1' AND instruction(14) = '0') OR (instruction(15) = '1' AND instruction(14) = '1')
+    regNum2 <= instruction(7 DOWNTO 5) WHEN (instruction(15) = '1' AND instruction(14) = '0')
+        OR
+        (instruction(15) = '1' AND instruction(14) = '1')
         ELSE
         instruction(10 DOWNTO 8)
         ;
 
     UpdateTheRegisters : RegFile PORT MAP(-- if 3 oprand  takes 2 , 3
-        clk, rst, regNum1, regNum2,
-        writeBack1Enable, writeBack2Enable,
-        writeBack1Address, writeBack2Address, writeBack1Data, writeBack2Data, reg1Value, reg2Value,
+        clk,
+        rst,
+        regNum1,
+        regNum2,
+        writeBack1Enable,
+        writeBack2Enable,
+        writeBack1Address,
+        writeBack2Address,
+        writeBack1Data,
+        writeBack2Data,
+        reg1Value,
+        reg2Value,
         register0,
         register1,
         register2,
@@ -151,9 +164,23 @@ BEGIN
     CreateControlSignals : ControlUnit PORT MAP(
         instruction,
         freeze,
-        alu(7), alu(6), alu(5), alu(4), alu(3 DOWNTO 0),
-        memory(8), memory(7), memory(6), memory(5), memory(4), memory(3), memory(2), memory(1), memory(0),
-        writeBack(3), writeBack(2), writeBack(1 DOWNTO 0)
-        , jmpFlag
+        alu(7),
+        alu(6),
+        alu(5),
+        alu(4),
+        alu(3 DOWNTO 0),
+        memory(8),
+        memory(7),
+        memory(6),
+        memory(5),
+        memory(4),
+        memory(3),
+        memory(2),
+        memory(1),
+        memory(0),
+        writeBack(3),
+        writeBack(2),
+        writeBack(1 DOWNTO 0),
+        jmpFlag
     );
 END ARCHITECTURE;

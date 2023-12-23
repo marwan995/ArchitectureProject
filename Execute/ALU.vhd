@@ -80,16 +80,28 @@ ARCHITECTURE ARCHALU OF ALU IS
         );
     END COMPONENT RCL;
 
+    COMPONENT BITSET IS
+        PORT (
+            a : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            b : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            result : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            carryOut : OUT STD_LOGIC
+        );
+    END COMPONENT BITSET;
+
     SIGNAL notOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL adderOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL andOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL orOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL xorOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL rcrOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL rclOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL bitsetOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     SIGNAL adderCarryOut : STD_LOGIC;
     SIGNAL rcrCarryOut : STD_LOGIC;
     SIGNAL rclCarryOut : STD_LOGIC;
+    SIGNAL bitsetCarryOut : STD_LOGIC;
 
     SIGNAL adderIn1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL adderCin : STD_LOGIC;
@@ -101,8 +113,10 @@ BEGIN
     -- 0010 neg
     -- 0011 inc
     -- 0100 dec
+    -- 0101 bitset
     -- 0110 RCL rotate left
     -- 0111 RCR rotate right
+    -- 1000 cmp
     -- 1001 add
     -- 1010 sub
     -- 1011 and
@@ -111,10 +125,11 @@ BEGIN
 
     NotOperation : ALUNOT PORT MAP(a, notOutput);
     RCROperation : RCR PORT MAP(a, b, flagRegBuffer(2), rcrOutput, rcrCarryOut);
-    RCLOperation : RCL PORT MAP(a, b, flagRegBuffer(2), rcrOutput, rcrCarryOut);
+    RCLOperation : RCL PORT MAP(a, b, flagRegBuffer(2), rclOutput, rclCarryOut);
     AndOperation : ALUAND PORT MAP(a, b, andOutput);
     OrOperation : ALUOR PORT MAP(a, b, orOutput);
     XorOperation : ALUXOR PORT MAP(a, b, xorOutput);
+    BitSetOperation : BITSET PORT MAP(a, b, bitsetOutput, bitsetCarryOut);
     AdderOperations : ALUADDER PORT MAP(adderIn1, b, adderCin, adderOperationSel, adderOutput, adderCarryOut);
 
     AdderOperationSel <= "11" WHEN operationSel = "0100" -- dec
@@ -123,7 +138,7 @@ BEGIN
         ELSE
         "01" WHEN operationSel = "1001" -- add
         ELSE
-        "10" WHEN operationSel = "1010" -- sub
+        "10" WHEN operationSel = "1010" OR operationSel = "1000"-- sub, cmp
         ELSE
         "ZZ";
 
@@ -133,7 +148,7 @@ BEGIN
         ELSE
         '0' WHEN operationSel = "1001" -- add
         ELSE
-        '1' WHEN operationSel = "1010" -- sub
+        '1' WHEN operationSel = "1010" OR operationSel = "1000"-- sub, cmp
         ELSE
         'Z'
         ;
@@ -143,11 +158,14 @@ BEGIN
         a
         ;
 
+    -- result
     resultTemp <= (OTHERS => '0') WHEN enable = '0'
         ELSE
         notOutput WHEN operationSel = "0001" -- not
         ELSE
-        adderOutput WHEN operationSel = "0100" OR operationSel = "0011" OR operationSel = "0010" OR operationSel = "1001" OR operationSel = "1010" -- dec, inc, not, add, sub
+        adderOutput WHEN operationSel = "0100" OR operationSel = "0011" OR operationSel = "0010" OR operationSel = "1001" OR operationSel = "1010" OR operationSel = "1000"-- dec, inc, not, add, sub, cmp
+        ELSE
+        bitsetOutput WHEN operationSel = "0101" -- bitset
         ELSE
         andOutput WHEN operationSel = "1011" -- and
         ELSE
@@ -157,12 +175,16 @@ BEGIN
         ELSE
         rcrOutput WHEN operationSel = "0111" -- rcr
         ELSE
+        rclOutput WHEN operationSel = "0110" -- rcl
+        ELSE
         (OTHERS => 'Z');
 
     result <= resultTemp;
 
     -- negative flag
-    flagReg(1) <= flagRegBuffer(1) WHEN enable = '0'
+    flagReg(1) <= flagRegBuffer(1) WHEN enable = '0' -- not enabled
+ELSE
+    flagRegBuffer(1) WHEN operationSel = "0101" OR operationSel = "0110" OR operationSel = "0111" -- enabled with opeation that doesn't update negative flag
 ELSE
     resultTemp(31);
 
@@ -173,10 +195,14 @@ ELSE
 ELSE
     rclCarryOut WHEN operationSel = "0110"
 ELSE
+    bitsetCarryOut WHEN operationSel = "0101"
+ELSE
     adderCarryOut -- till other is stated
     ;
 
-    flagReg(0) <= flagRegBuffer(0) WHEN enable = '0'
+    flagReg(0) <= flagRegBuffer(0) WHEN enable = '0' -- not enabled
+ELSE
+    flagRegBuffer(0) WHEN operationSel = "0101" OR operationSel = "0110" OR operationSel = "0111" -- enabled with opeation that doesn't update zero flag
 ELSE
     '1' WHEN resultTemp = "00000000000000000000000000000000"
     ;

@@ -18,9 +18,9 @@ ARCHITECTURE ArchRCL OF RCL IS
     SIGNAL rotated_vector : STD_LOGIC_VECTOR(32 DOWNTO 0);
 BEGIN
     to_rotate <= reg & carry;
-    amount_int <= to_integer(unsigned(amount));
+    amount_int <= to_integer(unsigned(amount(4 DOWNTO 0)));
 
-    rotated_vector <= (OTHERS => '0') WHEN amount_int = 0
+    rotated_vector <= to_rotate WHEN amount_int = 0
         ELSE
         to_rotate(32 - amount_int DOWNTO 0) & to_rotate(32 DOWNTO 33 - amount_int);
 

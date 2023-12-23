@@ -26,7 +26,7 @@ BEGIN
             temp <= '1';
 
             -- active high
-        ELSIF clk'event AND clk = '1' THEN
+        ELSIF rising_edge(clk) THEN
 
             -- toggle
             IF t = '0' THEN

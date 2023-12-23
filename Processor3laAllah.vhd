@@ -99,7 +99,7 @@ ARCHITECTURE ArchProcessor OF Processor IS
             src1Sel : IN STD_LOGIC;
             src2Sel : IN STD_LOGIC;
             src3Sel : IN STD_LOGIC;
-
+            flagRegBuffer : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             operationSel : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             src1 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             src2 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -205,10 +205,21 @@ BEGIN
     ----------------- Fetching -----------------------------
 
     Fetching : Fetch PORT MAP(
-        clock, rst, '0', '0', '0', '0',
-        assemblerWR, IF_ID_input(32), IF_ID_output(31 DOWNTO 16), assemblerInstruction,
-        IF_ID_input(31 DOWNTO 16), IF_ID_input(15 DOWNTO 0), (OTHERS => '0'), memoryPcSig,
-        (OTHERS => '0'), assemblerPC, IF_ID_input(64 DOWNTO 33)
+        clock,
+        rst,
+        IF_ID_output(32),
+        '0',
+        '0',
+        '0',
+        assemblerWR,
+        IF_ID_input(32),
+        IF_ID_output(31 DOWNTO 16),
+        assemblerInstruction,
+        IF_ID_input(31 DOWNTO 16),
+        IF_ID_input(15 DOWNTO 0),
+        (OTHERS => '0'), memoryPcSig,
+        (OTHERS => '0'), assemblerPC,
+        IF_ID_input(64 DOWNTO 33)
     );
 
     -- 15 : 0  immidate ,  31 :16 instruction , 32 freeze(imm) , 64 :33 PC 
@@ -272,6 +283,7 @@ BEGIN
         ID_EX_output(115),
         ID_EX_output(114),
         ID_EX_output(113),
+        EX_MEM_output(193 DOWNTO 190),
         ID_EX_output(112 DOWNTO 109),
         ID_EX_output(31 DOWNTO 0),
         ID_EX_output(63 DOWNTO 32),

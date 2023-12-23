@@ -6,7 +6,7 @@ ENTITY Decode IS
     PORT (
         clk : IN STD_LOGIC;
         rst : IN STD_LOGIC;
-        -- pcIn : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        freeze : IN STD_LOGIC;
         instruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         immedateValue : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         writeBack1Enable : IN STD_LOGIC;
@@ -85,6 +85,7 @@ ARCHITECTURE ArchDecode OF Decode IS
 
             --instruction
             instruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+            freeze : IN STD_LOGIC;
 
             -- --alu 
             aluEnable : OUT STD_LOGIC;
@@ -149,6 +150,7 @@ BEGIN
 
     CreateControlSignals : ControlUnit PORT MAP(
         instruction,
+        freeze,
         alu(7), alu(6), alu(5), alu(4), alu(3 DOWNTO 0),
         memory(8), memory(7), memory(6), memory(5), memory(4), memory(3), memory(2), memory(1), memory(0),
         writeBack(3), writeBack(2), writeBack(1 DOWNTO 0)

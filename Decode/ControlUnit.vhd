@@ -7,6 +7,7 @@ ENTITY ControlUnit IS
 
         --instruction
         instruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        freeze : IN STD_LOGIC;
 
         -- --alu 
         aluEnable : OUT STD_LOGIC; --7
@@ -52,10 +53,10 @@ BEGIN
     isJump <= (oneOperand AND (instruction(1) OR instruction(2)));
 
     -------------------------------Write Back ----------------------------
-    writeBackEnable <=
-        (oneOperand AND(instruction(1)nor instruction(2))and(not(instruction(6)) or (not(instruction(5)) and instruction(0))or (instruction(3)and instruction(4)))) OR
+    writeBackEnable <= NOT(not(freeze) AND instruction(0)) AND
+        ((oneOperand AND(instruction(1)NOR instruction(2)) AND (NOT(instruction(6)) OR (NOT(instruction(5)) AND instruction(0)) OR (instruction(3)AND instruction(4)))) OR
         (twoOperand AND (instruction(2) NAND instruction(1)))OR
-        (threeOperand);
+        (threeOperand));
 
     reg2Write <= (twoOperand) AND ((instruction(1)) NOR (instruction(2)));
     writeBackSelector(0) <=
@@ -70,12 +71,12 @@ BEGIN
     (oneOperand AND (instruction(6) AND NOT instruction(5) AND NOT instruction(4) AND instruction(3))) OR
     (oneOperand AND (instruction(6)AND instruction(5) AND instruction(4) AND instruction(3)) AND instruction(0));
     -------------------------------Memory ----------------------------
-    readOrWrite<=(isJump or ( oneOperand and (instruction(1) nor instruction(2)) and (instruction(6) and (instruction(3) nand instruction(4)))) );
-    memoryEnable <=
-        (zeroOperand AND instruction(6))OR
+    readOrWrite <= (isJump OR (oneOperand AND (instruction(1) NOR instruction(2)) AND (instruction(6) AND (instruction(3) NAND instruction(4)))));
+    memoryEnable <= NOT(not(freeze) AND instruction(0)) AND
+        ((zeroOperand AND instruction(6))OR
         (oneOperand AND (instruction(6) AND instruction(5)))OR
         (oneOperand AND (instruction(6) XOR instruction(5)) AND (instruction(3) NOR instruction(4)))OR
-        (oneOperand AND (instruction(1) AND instruction(2)))
+        (oneOperand AND (instruction(1) AND instruction(2))))
         ;
     memoryOrIO <=
         (oneOperand AND (instruction(3) NOR instruction(4)) AND (instruction(5) XOR instruction(6)));
@@ -91,7 +92,7 @@ BEGIN
     protectMemory <= (oneOperand AND (instruction(6)AND instruction(5) AND NOT (instruction(4))));
     jumpStopFlag <= ((zeroOperand AND instruction(2)) OR (memoryValueTemp));
     -------------------------------Alu ----------------------------
-    aluEnable <= ((oneOperand AND NOT(instruction(6)) AND (instruction(1) NOR instruction(2))) OR
+    aluEnable <= NOT(not(freeze) AND instruction(0)) AND ((oneOperand AND NOT(instruction(6)) AND (instruction(1) NOR instruction(2))) OR
         (threeOperand)OR
         (twoOperand AND instruction(1)));
     src1Selector <= (threeOperand) OR (twoOperand AND instruction(0));
@@ -105,18 +106,18 @@ BEGIN
     );
 
     aluOperationSelector(1) <= ((threeOperand AND instruction(4)) OR
-    (oneOperand and (NOT instruction(6) AND(instruction(5)AND instruction(4)))
-    )or
-    (oneOperand and (NOT instruction(6)  and NOT instruction(5) and ( instruction(4) xor instruction(3) ) ))
+    (oneOperand AND (NOT instruction(6) AND(instruction(5)AND instruction(4)))
+    )OR
+    (oneOperand AND (NOT instruction(6) AND NOT instruction(5) AND (instruction(4) XOR instruction(3))))
     );
 
-    aluOperationSelector(0) <= ((threeOperand AND (instruction(1) nand instruction(3))) OR
+    aluOperationSelector(0) <= ((threeOperand AND (instruction(1) NAND instruction(3))) OR
     (twoOperand AND instruction(0))OR
     (oneOperand AND instruction(0) AND instruction(3))OR
-    (oneOperand AND ( not instruction(0) and not instruction(6) and not instruction(3)))
+    (oneOperand AND (NOT instruction(0) AND NOT instruction(6) AND NOT instruction(3)))
 
     );
     -------------------------------PC ----------------------------
-    jmpFlag <= oneOperand and (instruction(1) xor instruction(2));
+    jmpFlag <= oneOperand AND (instruction(1) XOR instruction(2));
 
 END ARCHITECTURE;

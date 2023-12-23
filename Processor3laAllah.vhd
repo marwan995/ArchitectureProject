@@ -37,7 +37,6 @@ ARCHITECTURE ArchProcessor OF Processor IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            freeze : IN STD_LOGIC;
             callRtiFlag : IN STD_LOGIC;
             memoryPcFlag : IN STD_LOGIC;
             jumpPcFlag : IN STD_LOGIC;
@@ -60,7 +59,7 @@ ARCHITECTURE ArchProcessor OF Processor IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            -- pcIn : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            freeze : IN STD_LOGIC;
             instruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
             immedateValue : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
             writeBack1Enable : IN STD_LOGIC;
@@ -207,13 +206,12 @@ BEGIN
     Fetching : Fetch PORT MAP(
         clock,
         rst,
-        IF_ID_output(32),
         '0',
         '0',
         '0',
         assemblerWR,
         IF_ID_input(32),
-        IF_ID_output(31 DOWNTO 16),
+        IF_ID_input(31 DOWNTO 16),
         assemblerInstruction,
         IF_ID_input(31 DOWNTO 16),
         IF_ID_input(15 DOWNTO 0),
@@ -221,6 +219,12 @@ BEGIN
         (OTHERS => '0'), assemblerPC,
         IF_ID_input(64 DOWNTO 33)
     );
+
+    -- mux to forward a nop when there's an immediate instruction
+
+    -- ImmediateInstruction : Mux2 PORT MAP(
+    --     IF_ID_input(31 downto 16), (others => '0') , freeze, instructionMuxOut
+    -- );
 
     -- 15 : 0  immidate ,  31 :16 instruction , 32 freeze(imm) , 64 :33 PC 
     IF_ID : PipeLineReg GENERIC MAP(
@@ -233,6 +237,7 @@ BEGIN
     Decoding : Decode PORT MAP(
         clock,
         rst,
+        IF_ID_output(32),
         IF_ID_output(31 DOWNTO 16),
         IF_ID_output(15 DOWNTO 0),
         writeBack1EnableSig,

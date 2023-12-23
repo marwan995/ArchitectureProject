@@ -6,7 +6,6 @@ ENTITY Fetch IS
     PORT (
         clk : IN STD_LOGIC;
         rst : IN STD_LOGIC;
-        freeze : IN STD_LOGIC;
         callRtiFlag : IN STD_LOGIC;
         memoryPcFlag : IN STD_LOGIC;
         jumpPcFlag : IN STD_LOGIC;
@@ -80,7 +79,11 @@ ARCHITECTURE ArchFetch OF Fetch IS
     SIGNAL jmpMuxOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL pcMuxOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL updatedPc : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL TFFCLK : STD_LOGIC;
+    SIGNAL freeze : STD_LOGIC;
 BEGIN
+    TFFCLK <= NOT(clk);
+    immedateFlag <= freeze;
 
     ImmidateValue : Mux2 PORT MAP(
     (OTHERS => '0'), instruction, freeze, immedateOut
@@ -92,7 +95,7 @@ BEGIN
     instructionOut <= instructionMuxOut;
 
     ImmidateFlag : TFlipFlop PORT MAP(
-        instructionMuxOut(0), rst, '0', clk, immedateFlag, OPEN
+        instructionMuxOut(0), rst, '0', TFFCLK, freeze, OPEN
     );
 
     InstructionsMemoryPC : Mux2 GENERIC MAP(

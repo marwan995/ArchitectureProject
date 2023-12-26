@@ -184,8 +184,8 @@ BEGIN
     -- negative flag
     flagReg(1) <= flagRegBuffer(1) WHEN enable = '0' -- not enabled
 ELSE
-    flagRegBuffer(1) WHEN operationSel = "0101" OR operationSel = "0110" OR operationSel = "0111" -- enabled with opeation that doesn't update negative flag
-ELSE
+    --     flagRegBuffer(1) WHEN operationSel = "0101" OR operationSel = "0110" OR operationSel = "0111" -- enabled with opeation that doesn't update negative flag
+    -- ELSE
     resultTemp(31);
 
     -- carry flag
@@ -197,14 +197,20 @@ ELSE
 ELSE
     bitsetCarryOut WHEN operationSel = "0101"
 ELSE
-    adderCarryOut -- till other is stated
+    adderCarryOut WHEN operationSel = "0011" OR operationSel = "1001" -- inc, add-- till other is stated
+ELSE
+    '0'
     ;
 
     flagReg(0) <= flagRegBuffer(0) WHEN enable = '0' -- not enabled
 ELSE
-    flagRegBuffer(0) WHEN operationSel = "0101" OR operationSel = "0110" OR operationSel = "0111" -- enabled with opeation that doesn't update zero flag
-ELSE
+    --     flagRegBuffer(0) WHEN operationSel = "0101" OR operationSel = "0110" OR operationSel = "0111" -- enabled with opeation that doesn't update zero flag
+    -- ELSE
     '1' WHEN resultTemp = "00000000000000000000000000000000"
+ELSE
+    '0'
     ;
+
+    flagReg(3) <= '0';
 
 END ARCHITECTURE;

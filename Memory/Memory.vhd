@@ -13,6 +13,7 @@ ENTITY Memory IS
         flagsIn : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
         flagsOut : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
         pc : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+        flagSelector : IN STD_LOGIC;
 
         --IO
         inputPort : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
@@ -119,7 +120,7 @@ ARCHITECTURE ArchMemory OF Memory IS
     SIGNAL memoryOutTemp : STD_LOGIC_VECTOR (31 DOWNTO 0);
     SIGNAL isProtected : STD_LOGIC;
     SIGNAL initial_value : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL flagSelector : STD_LOGIC;
+    --   SIGNAL flagSelector : STD_LOGIC;
     SIGNAL dataMemoryWR : STD_LOGIC;
     SIGNAL dataMemoryEnable : STD_LOGIC;
     SIGNAL protectedMemoryDataIn : STD_LOGIC;
@@ -185,7 +186,7 @@ BEGIN
         callOut, (OTHERS => '0'), instructionFreeCondation, memoryValueOut
     );
     ---------------Flags -----------------------------
-    flagSelector <= (NOT (memorySignals(6)) AND memorySignals(0));
+    -- flagSelector <= (NOT (memorySignals(6)) AND memorySignals(0));
 
     flags : Mux2 GENERIC MAP(
         4) PORT MAP(

@@ -119,6 +119,7 @@ ARCHITECTURE ArchProcessor OF Processor IS
             flagsIn : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
             flagsOut : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
             pc : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+            flagSelector : IN STD_LOGIC;
 
             --IO
             inputPort : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
@@ -169,8 +170,8 @@ ARCHITECTURE ArchProcessor OF Processor IS
     SIGNAL ID_EX_input : STD_LOGIC_VECTOR(165 DOWNTO 0) := (OTHERS => '0');
     SIGNAL ID_EX_output : STD_LOGIC_VECTOR(165 DOWNTO 0) := (OTHERS => '0');
 
-    SIGNAL EX_MEM_input : STD_LOGIC_VECTOR(194 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL EX_MEM_output : STD_LOGIC_VECTOR(194 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL EX_MEM_input : STD_LOGIC_VECTOR(193 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL EX_MEM_output : STD_LOGIC_VECTOR(193 DOWNTO 0) := (OTHERS => '0');
 
     SIGNAL MEM_WB_input : STD_LOGIC_VECTOR(211 DOWNTO 0) := (OTHERS => '0');
     SIGNAL MEM_WB_output : STD_LOGIC_VECTOR(211 DOWNTO 0) := (OTHERS => '0');
@@ -313,12 +314,12 @@ BEGIN
     -- forward pc
     EX_MEM_input(188 DOWNTO 157) <= ID_EX_output(165 DOWNTO 134);
 
-    -- 31:0 src1,       63:32 src2,   95:64 ALU output,
-    --  127:96 immediate(sign extended),
-    -- 131:128 WB,       140:132 MEM,    ,    156:141 instruction,
+    -- 31:0 src1,      63:32 src2,   95:64 ALU output,
+    -- 127:96 immediate(sign extended),
+    -- 131:128 WB,     140:132 MEM,    ,    156:141 instruction,
     -- 188:157 pc      189 stop flag  ,  193:190 flag regesiter 
     EX_MEM : pipeLineReg GENERIC MAP(
-        195) PORT MAP(
+        194) PORT MAP(
         clock, rst, EX_MEM_input, EX_MEM_output
     );
 
@@ -330,8 +331,9 @@ BEGIN
         EX_MEM_output(127 DOWNTO 96),
         EX_MEM_output(31 DOWNTO 0),
         EX_MEM_output (193 DOWNTO 190),
-        EX_MEM_input (193 DOWNTO 190),
+        OPEN, --EX_MEM_input (193 DOWNTO 190),
         EX_MEM_output(188 DOWNTO 157),
+        '0',
         inputPort,
         outPort,
         MEM_WB_input(95 DOWNTO 64),

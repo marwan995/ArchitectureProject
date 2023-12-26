@@ -115,6 +115,15 @@ ARCHITECTURE ArchRegFile OF RegFile IS
     SIGNAL tristate6InputBus2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL tristate7InputBus2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
+    SIGNAL out0Mux : STD_LOGIC;
+    SIGNAL out1Mux : STD_LOGIC;
+    SIGNAL out2Mux : STD_LOGIC;
+    SIGNAL out3Mux : STD_LOGIC;
+    SIGNAL out4Mux : STD_LOGIC;
+    SIGNAL out5Mux : STD_LOGIC;
+    SIGNAL out6Mux : STD_LOGIC;
+    SIGNAL out7Mux : STD_LOGIC;
+
     SIGNAL reg0WriteEnable : STD_LOGIC;
     SIGNAL reg1WriteEnable : STD_LOGIC;
     SIGNAL reg2WriteEnable : STD_LOGIC;
@@ -192,15 +201,24 @@ BEGIN
     tristate6bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate6EnableBus2, tristate6InputBus2, dataBus2);
     tristate7bus2 : TriStateBuffer GENERIC MAP(32) PORT MAP(tristate7EnableBus2, tristate7InputBus2, dataBus2);
 
+    out0Mux <= (writeBackReg2EnableList(0) AND writeBack2Enable);
+    out1Mux <= (writeBackReg2EnableList(1) AND writeBack2Enable);
+    out2Mux <= (writeBackReg2EnableList(2) AND writeBack2Enable);
+    out3Mux <= (writeBackReg2EnableList(3) AND writeBack2Enable);
+    out4Mux <= (writeBackReg2EnableList(4) AND writeBack2Enable);
+    out5Mux <= (writeBackReg2EnableList(5) AND writeBack2Enable);
+    out6Mux <= (writeBackReg2EnableList(6) AND writeBack2Enable);
+    out7Mux <= (writeBackReg2EnableList(7) AND writeBack2Enable);
+
     -- reg input (muxes)
-    reg0DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, writeBack2Enable, reg0MuxOutput);
-    reg1DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, writeBack2Enable, reg1MuxOutput);
-    reg2DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, writeBack2Enable, reg2MuxOutput);
-    reg3DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, writeBack2Enable, reg3MuxOutput);
-    reg4DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, writeBack2Enable, reg4MuxOutput);
-    reg5DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, writeBack2Enable, reg5MuxOutput);
-    reg6DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, writeBack2Enable, reg6MuxOutput);
-    reg7DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, writeBack2Enable, reg7MuxOutput);
+    reg0DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, out0Mux, reg0MuxOutput);
+    reg1DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, out1Mux, reg1MuxOutput);
+    reg2DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, out2Mux, reg2MuxOutput);
+    reg3DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, out3Mux, reg3MuxOutput);
+    reg4DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, out4Mux, reg4MuxOutput);
+    reg5DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, out5Mux, reg5MuxOutput);
+    reg6DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, out6Mux, reg6MuxOutput);
+    reg7DataIn : Mux2 GENERIC MAP(32) PORT MAP(writeBack1Data, writeBack2Data, out7Mux, reg7MuxOutput);
 
     -- reg enables
     reg0WriteEnable <= ((writeBackReg1EnableList(0) AND writeBack1Enable) OR (writeBackReg2EnableList(0) AND writeBack2Enable));

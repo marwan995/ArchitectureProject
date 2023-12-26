@@ -198,7 +198,7 @@ ARCHITECTURE ArchProcessor OF Processor IS
     SIGNAL writeBack1DataSig : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL writeBack2DataSig : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL memoryPcSig : STD_LOGIC_VECTOR(31 DOWNTO 0);
-
+    SIGNAL jmpAndJz : STD_LOGIC;
     SIGNAL notClk : STD_LOGIC;
 
 BEGIN
@@ -216,6 +216,7 @@ BEGIN
     currentInstruction <= IF_ID_input(31 DOWNTO 16);
     flags <= EX_MEM_output(193 DOWNTO 190);
     memoryOut <= MEM_WB_output(95 DOWNTO 64);
+
     ----------------- Fetching -----------------------------
 
     Fetching : Fetch PORT MAP(
@@ -223,15 +224,17 @@ BEGIN
         rst,
         '0',
         '0',
-        '0',
+        ID_EX_output(117),
         assemblerWR,
         IF_ID_input(32),
         IF_ID_input(31 DOWNTO 16),
         assemblerInstruction,
         IF_ID_input(31 DOWNTO 16),
         IF_ID_input(15 DOWNTO 0),
-        (OTHERS => '0'), memoryPcSig,
-        (OTHERS => '0'), assemblerPC,
+        ID_EX_output (31 DOWNTO 0),
+        memoryPcSig,
+        (OTHERS => '0'),
+        assemblerPC,
         IF_ID_input(64 DOWNTO 33)
     );
 
@@ -262,7 +265,7 @@ BEGIN
         ID_EX_input(99 DOWNTO 96),
         ID_EX_input(108 DOWNTO 100),
         ID_EX_input(116 DOWNTO 109),
-        ID_EX_input(117),
+        jmpAndJz,
 
         register0,
         register1,
@@ -273,7 +276,7 @@ BEGIN
         register6,
         register7
     );
-
+    ID_EX_input(117) <= jmpAndJz and (not IF_ID_output(17) or EX_MEM_input(190));
     -- forward instruction
     ID_EX_input(133 DOWNTO 118) <= IF_ID_output(31 DOWNTO 16);
 

@@ -153,6 +153,16 @@ ARCHITECTURE ArchProcessor OF Processor IS
         );
     END COMPONENT WriteBack;
 
+    COMPONENT Mux2 IS
+        GENERIC (n : INTEGER := 1);
+        PORT (
+            a : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+            b : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+            selector : IN STD_LOGIC;
+            output : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
+        );
+    END COMPONENT Mux2;
+
     COMPONENT PipeLineReg IS
         GENERIC (n : INTEGER := 32);
         PORT (
@@ -164,6 +174,10 @@ ARCHITECTURE ArchProcessor OF Processor IS
     END COMPONENT PipeLineReg;
 
     SIGNAL clock : STD_LOGIC := '1';
+    SIGNAL flagRegSelector : STD_LOGIC := '0';
+    SIGNAL ALUFlagOut : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL MemoryFlagOut : STD_LOGIC_VECTOR(3 DOWNTO 0);
+
     SIGNAL IF_ID_input : STD_LOGIC_VECTOR(64 DOWNTO 0) := (OTHERS => '0');
     SIGNAL IF_ID_output : STD_LOGIC_VECTOR(64 DOWNTO 0) := (OTHERS => '0');
 
@@ -289,8 +303,15 @@ BEGIN
         ID_EX_output(63 DOWNTO 32),
         ID_EX_output(95 DOWNTO 64),
 
-        EX_MEM_input(193 DOWNTO 190),
+        ALUFlagOut,
         EX_MEM_input(95 DOWNTO 64)
+    );
+
+    flagRegSelector <= (NOT (ID_EX_output(106)) AND ID_EX_output(100));
+
+    flagRegMux : Mux2 GENERIC MAP(
+        4) PORT MAP(
+        ALUflagOut, MemoryflagOut, flagRegSelector, EX_MEM_input(193 DOWNTO 190)
     );
 
     -- forward src1
@@ -331,7 +352,7 @@ BEGIN
         EX_MEM_output(127 DOWNTO 96),
         EX_MEM_output(31 DOWNTO 0),
         EX_MEM_output (193 DOWNTO 190),
-        OPEN, --EX_MEM_input (193 DOWNTO 190),
+        MemoryFlagOut,
         EX_MEM_output(188 DOWNTO 157),
         '0',
         inputPort,

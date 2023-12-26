@@ -20,7 +20,8 @@ ENTITY Memory IS
         outputPort : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
 
         memoryOut : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
-        protectionFlag : OUT STD_LOGIC
+        protectionFlag : OUT STD_LOGIC;
+        stackPointerOutput : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 
     );
 END Memory;
@@ -36,6 +37,17 @@ ARCHITECTURE ArchMemory OF Memory IS
             outData : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
         );
     END COMPONENT REG;
+
+    COMPONENT stackReg IS
+        PORT (
+            clk : IN STD_LOGIC;
+            en : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            inData : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            outData : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        );
+    END COMPONENT stackReg;
+
     COMPONENT Mux2 IS
         GENERIC (n : INTEGER := 16);
         PORT (
@@ -100,6 +112,7 @@ ARCHITECTURE ArchMemory OF Memory IS
     END COMPONENT IO;
 
     SIGNAL StackPointerIn : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000111111111111";
+    SIGNAL StackPointerTemp : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000111111111111";
     SIGNAL StackPointerOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL StackPointerPlus4 : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL StackPointerPlus2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -128,12 +141,12 @@ ARCHITECTURE ArchMemory OF Memory IS
 BEGIN
 
     ---------------StackPointer -----------------------------
+    StackPointerOutput <= StackPointerIn;
 
-    StackPointer : REG GENERIC MAP(
-        32) PORT MAP(
-        clk, MemorySignals(3), rst, StackPointerIn, StackPointerOut
+    StackPointer : stackReg PORT MAP(
+        clk, MemorySignals(3), rst, StackPointerTemp, StackPointerIn
     );
-    changeSp : IncDecALU GENERIC MAP(32) PORT MAP(MemorySignals(3), MemorySignals(2), StackPointerIn, "00000000000000000000000000000010", StackPointerOut);
+    changeSp : IncDecALU GENERIC MAP(32) PORT MAP(MemorySignals(3), MemorySignals(2), StackPointerIn, "00000000000000000000000000000010", StackPointerTemp);
     ---------------increment -----------------------------
 
     SpPlusTwo : FullAdder GENERIC MAP(

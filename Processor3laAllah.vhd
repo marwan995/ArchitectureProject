@@ -28,7 +28,9 @@ ENTITY Processor IS
         register4 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         register5 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         register6 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-        register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+        stackPointer : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
 END Processor;
 
@@ -126,7 +128,9 @@ ARCHITECTURE ArchProcessor OF Processor IS
             outputPort : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
 
             memoryOut : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
-            protectionFlag : OUT STD_LOGIC
+            protectionFlag : OUT STD_LOGIC;
+
+            stackPointerOutput : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 
         );
     END COMPONENT Memory;
@@ -307,7 +311,7 @@ BEGIN
         EX_MEM_input(95 DOWNTO 64)
     );
 
-    flagRegSelector <= (NOT (ID_EX_output(106)) AND ID_EX_output(100));
+    flagRegSelector <= NOT (ID_EX_output(106)) AND ID_EX_output(100);
 
     flagRegMux : Mux2 GENERIC MAP(
         4) PORT MAP(
@@ -354,11 +358,12 @@ BEGIN
         EX_MEM_output (193 DOWNTO 190),
         MemoryFlagOut,
         EX_MEM_output(188 DOWNTO 157),
-        '0',
+        flagRegSelector,
         inputPort,
         outPort,
         MEM_WB_input(95 DOWNTO 64),
-        protectFlag
+        protectFlag,
+        stackPointer
     );
 
     -- forward src1

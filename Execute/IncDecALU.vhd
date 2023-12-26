@@ -43,5 +43,5 @@ BEGIN
     adderCin <= '0' WHEN enable = '0' ELSE
         NOT(inc);
 
-    IncDecAdder : ALUADDER PORT MAP(a, incVal, inc, incDecSel, result);
+    IncDecAdder : ALUADDER PORT MAP(a, incVal, adderCin, incDecSel, result);
 END ARCHITECTURE;

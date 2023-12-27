@@ -33,7 +33,10 @@ ENTITY Decode IS
         register4 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         register5 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         register6 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-        register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+        reg1NumOut : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        reg2NumOut : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
 
         -- reg1Test: out std_logic_vector(2 downto 0);
         -- reg2Test: out std_logic_vector(2 downto 0)
@@ -124,7 +127,10 @@ BEGIN
         immedateValue, immedateValueExtended
     );
 
-    regNum1 <= instruction(10 DOWNTO 8) WHEN (instruction(15) = '1' AND instruction(14) = '0' AND instruction(2) = '0')
+    reg1NumOut <=  regNum1;
+    reg2NumOut <=  regNum2;
+
+    regNum1 <= instruction(10 DOWNTO 8) WHEN (instruction(15) = '1' AND instruction(14) = '0' AND instruction(2) = '0' AND instruction(2) = '0')
         OR
         (instruction(15) = '1' AND instruction(14) = '1')
         ELSE

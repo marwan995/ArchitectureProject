@@ -33,7 +33,7 @@ ARCHITECTURE Arch_instructionMemory OF instructionMemory IS
         RETURN memory;
     END FUNCTION;
 
-    SIGNAL instructionMemory : instructionMemory_type := load_memory_from_file("D:/CMP/3rd year/1st semester/Computer Architecutre/Project/ArchitectureProject/Fetch/codes.txt");
+    SIGNAL instructionMemory : instructionMemory_type := load_memory_from_file("D:/Study/CMP3/Architecture/Project/code/Fetch/codes.txt");
 BEGIN
     PROCESS (clk) IS
     BEGIN

@@ -130,7 +130,7 @@ BEGIN
     reg1NumOut <=  regNum1;
     reg2NumOut <=  regNum2;
 
-    regNum1 <= instruction(10 DOWNTO 8) WHEN (instruction(15) = '1' AND instruction(14) = '0' AND instruction(2) = '0')
+    regNum1 <= instruction(10 DOWNTO 8) WHEN (instruction(15) = '1' AND instruction(14) = '0' AND instruction(2) = '0' AND instruction(2) = '0')
         OR
         (instruction(15) = '1' AND instruction(14) = '1')
         ELSE

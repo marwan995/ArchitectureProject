@@ -21,7 +21,8 @@ ENTITY Fetch IS
         memoryPc : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         stackPc : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         assemblerPC : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-        pcOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        pcOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        rstInData : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
 END Fetch;
 
@@ -69,6 +70,16 @@ ARCHITECTURE ArchFetch OF Fetch IS
             carryOut : OUT STD_LOGIC);
     END COMPONENT FullAdder;
 
+    COMPONENT Pc IS
+        PORT (
+            clk : IN STD_LOGIC;
+            en : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            inData : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            rstData : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            outData : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        );
+    END COMPONENT Pc;
     SIGNAL instruction2Read : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL instruction : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL InstructionMuxOut : STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -108,9 +119,8 @@ BEGIN
         instruction
     );
 
-    ProgramCounter : REG GENERIC MAP(
-        32) PORT MAP(
-        clk, '1', rst, pcRegIn, pcRegOut
+    ProgramCounter : Pc PORT MAP(
+        clk, '1', rst, pcRegIn, rstInData, pcRegOut
     );
 
     pcOut <= updatedPc;

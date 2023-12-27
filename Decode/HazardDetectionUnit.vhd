@@ -5,7 +5,8 @@ USE ieee.numeric_std.ALL;
 ENTITY HazardDetectionUnit IS
     PORT (
         --instruction
-        instruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        instructionAlu : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        instructionMemo : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         --Regs 
         reg : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
         aluReg1 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -26,8 +27,11 @@ END HazardDetectionUnit;
 ARCHITECTURE ArchHazardDetectionUnit OF HazardDetectionUnit IS
     SIGNAL zeroOperand, oneOperand, twoOperand, threeOperand : STD_LOGIC;
     SIGNAL ldm : STD_LOGIC;
+    SIGNAL instruction : STD_LOGIC_VECTOR (15 DOWNTO 0);
     SIGNAL swap : STD_LOGIC;
 BEGIN
+    instruction <= instructionAlu WHEN (reg = aluReg1 OR reg = aluReg2) ELSE
+        instructionMemo;
     -------------------------------initialize the operand ----------------------------
     zeroOperand <= (instruction(15)) NOR (instruction(14));
     oneOperand <= NOT((instruction(15))) AND instruction(14);
@@ -39,12 +43,12 @@ BEGIN
     ForwordEnable <= '1'
         WHEN (reg = memoryReg1 OR reg = memoryReg2 OR reg = aluReg1 OR reg = aluReg2) ELSE
         '0';
-    ForwordFrom <= '1'
-        WHEN (reg = memoryReg1 OR reg = memoryReg2) ELSE
-        '0';
+    ForwordFrom <= '0'
+        WHEN (reg = aluReg1 OR reg = aluReg2) ELSE
+        '1';
     ForwordAluSelector <= "11" WHEN swap = '1' AND (reg = aluReg1 OR reg = memoryReg1) ELSE
         "10" WHEN swap = '1' AND (reg = aluReg2 OR reg = memoryReg2) ELSE
-        "01" WHEN ldm='1' ELSE
+        "01" WHEN ldm = '1' ELSE
         "00";
     ForwordMemoryEnable <= '1' WHEN oneOperand = '1' AND (instruction(6 DOWNTO 3) = "1111" OR instruction(6 DOWNTO 3) = "0100") ELSE
         '0';

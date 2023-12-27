@@ -197,7 +197,8 @@ ARCHITECTURE ArchProcessor OF Processor IS
     COMPONENT HazardDetectionUnit IS
         PORT (
             --instruction
-            instruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+            instructionAlu : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+            instructionMemo : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
             --Regs 
             reg : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
             aluReg1 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -348,8 +349,8 @@ BEGIN
         ID_EX_input(168 downto 166),
         ID_EX_input(171 downto 169)
     );
-    decodeReg1Num <= ID_EX_input(168 downto 166);
-    decodeReg2Num <= ID_EX_input(171 downto 169);
+    decodeReg1Num <= ID_EX_output(168 downto 166);
+    decodeReg2Num <= ID_EX_output(171 downto 169);
 
     ID_EX_input(117) <= jmpAndJz AND (NOT IF_ID_output(17) OR EX_MEM_input(190));
     -- forward instruction
@@ -506,12 +507,13 @@ BEGIN
 
     ----------------- HazardDetection unit ----------------------------
     HazardDetectionUnitR1 : HazardDetectionUnit PORT MAP(
-        IF_ID_output(31 DOWNTO 16),
+        EX_MEM_output(156 downto 141),
+        MEM_WB_output(179 downto 164),
         decodeReg1Num,
-        ID_EX_output(168 downto 166),
-        ID_EX_output(171 downto 169),
         EX_MEM_output(196 downto 194),
         EX_MEM_output(199 downto 197),
+        MEM_WB_output(214 downto 212),
+        MEM_WB_output(217 downto 215),
         ForwordEnable1,
         ForwordFrom1,
         ForwordAluSelector1,
@@ -519,12 +521,13 @@ BEGIN
     );
 
     HazardDetectionUnitR2 : HazardDetectionUnit PORT MAP(
-        IF_ID_output(31 DOWNTO 16),
+        EX_MEM_output(156 downto 141),
+        MEM_WB_output(179 downto 164),
         decodeReg2Num,
-        ID_EX_output(168 downto 166),
-        ID_EX_output(171 downto 169),
         EX_MEM_output(196 downto 194),
         EX_MEM_output(199 downto 197),
+        MEM_WB_output(214 downto 212),
+        MEM_WB_output(217 downto 215),
         ForwordEnable2,
         ForwordFrom2,
         ForwordAluSelector2,
@@ -555,7 +558,7 @@ BEGIN
     );
 
     ForwardUnitTest2 : ForwardUnit PORT MAP(
-        ID_EX_output(31 DOWNTO 0),
+        ID_EX_output(63 DOWNTO 32),
         EX_MEM_output(95 DOWNTO 64),
         EX_MEM_output(127 DOWNTO 96),
         EX_MEM_output(31 DOWNTO 0),
@@ -568,10 +571,10 @@ BEGIN
         MEM_WB_output(63 DOWNTO 32),
         MEM_WB_output(95 DOWNTO 64),
 
-        ForwordAluSelector1,
-        ForwordMemoryEnable1,
-        ForwordEnable1,
-        ForwordFrom1,
+        ForwordAluSelector2,
+        ForwordMemoryEnable2,
+        ForwordEnable2,
+        ForwordFrom2,
 
         ALUSrc2
     );

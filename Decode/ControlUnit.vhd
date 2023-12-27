@@ -69,7 +69,8 @@ BEGIN
 
     writeBackSelector(1) <= (oneOperand AND (NOT instruction(6) AND instruction(5) AND NOT instruction(4) AND NOT instruction(3))) OR
     (oneOperand AND (instruction(6) AND NOT instruction(5) AND NOT instruction(4) AND instruction(3))) OR
-    (oneOperand AND (instruction(6)AND instruction(5) AND instruction(4) AND instruction(3)) AND instruction(0));
+    (oneOperand AND (instruction(6)AND instruction(5) AND instruction(4) AND instruction(3)) AND instruction(0))
+    OR (oneOperand AND instruction(3) AND instruction(4) AND instruction(5) AND instruction(6) AND NOT instruction(0));
     -------------------------------Memory ----------------------------
     readOrWrite <= (isJump OR (oneOperand AND (instruction(1) NOR instruction(2)) AND (instruction(6) AND (instruction(3) NAND instruction(4)))));
     memoryEnable <= NOT(not(freeze) AND instruction(0)) AND

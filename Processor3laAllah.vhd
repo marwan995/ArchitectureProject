@@ -230,22 +230,7 @@ ARCHITECTURE ArchProcessor OF Processor IS
     SIGNAL flagRegSelector : STD_LOGIC := '0';
     SIGNAL ALUFlagOut : STD_LOGIC_VECTOR(3 DOWNTO 0);
     SIGNAL MemoryFlagOut : STD_LOGIC_VECTOR(3 DOWNTO 0);
-    SIGNAL decodeReg1Num : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    SIGNAL decodeReg2Num : STD_LOGIC_VECTOR(2 DOWNTO 0);
-
-    -- hazard detection outputs
-    SIGNAL ForwordEnable1 :  STD_LOGIC;
-    SIGNAL ForwordFrom1 :  STD_LOGIC;
-    SIGNAL ForwordAluSelector1 :  STD_LOGIC_VECTOR (1 DOWNTO 0);
-    SIGNAL ForwordMemoryEnable1 : STD_LOGIC;
-    SIGNAL ForwordEnable2 :  STD_LOGIC;
-    SIGNAL ForwordFrom2 :  STD_LOGIC;
-    SIGNAL ForwordAluSelector2 :  STD_LOGIC_VECTOR (1 DOWNTO 0);
-    SIGNAL ForwordMemoryEnable2 : STD_LOGIC;
-
-    -- forward unit output
-    SIGNAL ALUSrc1 :  STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL ALUSrc2 :  STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL aluEnable : std_logic;
 
     SIGNAL IF_ID_input : STD_LOGIC_VECTOR(64 DOWNTO 0) := (OTHERS => '0');
     SIGNAL IF_ID_output : STD_LOGIC_VECTOR(64 DOWNTO 0) := (OTHERS => '0');
@@ -370,9 +355,13 @@ BEGIN
 
     ----------------- Execute ----------------------------
 
+    aluEnable <= '0' WHEN ID_EX_output(97) = '1' and ID_EX_output(116) = '1' and ID_EX_output(112 downto 109) = "0001"
+    else
+    ID_EX_output(116);
+
     Executing : Execute PORT MAP(
         clock,
-        ID_EX_output(116),
+        aluEnable,
         ID_EX_output(118),
         ID_EX_output(115),
         ID_EX_output(114),

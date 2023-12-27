@@ -189,7 +189,7 @@ ELSE
     resultTemp(31);
 
     -- carry flag
-    flagReg(2) <= flagRegBuffer(2) WHEN enable = '0'
+    flagReg(2) <= flagRegBuffer(2) WHEN enable = '0' OR operationSel = "0001" OR operationSel = "0101" OR operationSel = "1011" OR operationSel = "1100" OR operationSel = "1101" -- bitset, not, or, and, xor
 ELSE
     rcrCarryOut WHEN operationSel = "0111"
 ELSE

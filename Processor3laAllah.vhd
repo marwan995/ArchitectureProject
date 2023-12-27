@@ -183,6 +183,7 @@ ARCHITECTURE ArchProcessor OF Processor IS
     SIGNAL flagRegSelector : STD_LOGIC := '0';
     SIGNAL ALUFlagOut : STD_LOGIC_VECTOR(3 DOWNTO 0);
     SIGNAL MemoryFlagOut : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL aluEnable : std_logic;
 
     SIGNAL IF_ID_input : STD_LOGIC_VECTOR(64 DOWNTO 0) := (OTHERS => '0');
     SIGNAL IF_ID_output : STD_LOGIC_VECTOR(64 DOWNTO 0) := (OTHERS => '0');
@@ -301,9 +302,13 @@ BEGIN
 
     ----------------- Execute ----------------------------
 
+    aluEnable <= '0' WHEN ID_EX_output(97) = '1' and ID_EX_output(116) = '1' and ID_EX_output(112 downto 109) = "0001"
+    else
+    ID_EX_output(116);
+
     Executing : Execute PORT MAP(
         clock,
-        ID_EX_output(116),
+        aluEnable,
         ID_EX_output(118),
         ID_EX_output(115),
         ID_EX_output(114),

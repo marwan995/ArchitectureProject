@@ -1,28 +1,27 @@
-in r1
 in r2
 in r3
-in R4
-nop
-addi r5 r3 2
-add r4 r1 r4
+in r4
+ldm r1 f5h
 nop
 nop
-sub r6 r5 r4
+push r1
+push r2
 nop
 nop
-and r6 r7 r6
-or r1 r2 r1
-rcl r2 2
+pop r1
 nop
 nop
-rcr r2 3
+pop r2
 nop
 nop
-swap r2 r5
+std r2 200h
+std r1 202h
+ldd r3 202h
+ldd r4 200h
 nop
-nop
-add r2 r5 r2
-nop
-nop
-bitset r2 2
-xor r1 r1 r1
+std r3 f5h
+protect r4
+std r4 f5h
+ldd r5 f5h
+free r4
+ldd r5 f5h

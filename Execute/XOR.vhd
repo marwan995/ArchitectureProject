@@ -13,6 +13,6 @@ END ALUXOR;
 ARCHITECTURE ArchALUXOR OF ALUXOR IS
 BEGIN
 
-    result <= a AND b;
+    result <= a XOR b;
 
 END ARCHITECTURE;

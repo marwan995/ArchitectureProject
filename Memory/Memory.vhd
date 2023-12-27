@@ -114,6 +114,15 @@ ARCHITECTURE ArchMemory OF Memory IS
         );
     END COMPONENT IO;
 
+    COMPONENT Mux1B IS
+        PORT (
+            a : IN STD_LOGIC;
+            b : IN STD_LOGIC;
+            selector : IN STD_LOGIC;
+            output : OUT STD_LOGIC
+        );
+    END COMPONENT Mux1B;
+
     SIGNAL StackPointerIn : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000111111111111";
     SIGNAL StackPointerTemp : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000111111111111";
     SIGNAL StackPointerOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -141,13 +150,21 @@ ARCHITECTURE ArchMemory OF Memory IS
     SIGNAL dataMemoryEnable : STD_LOGIC;
     SIGNAL protectedMemoryDataIn : STD_LOGIC;
     SIGNAL IoEnable : STD_LOGIC;
+    SIGNAL notClk : STD_LOGIC;
+    SIGNAL stackRegClk : STD_LOGIC;
+
 BEGIN
+    notClk <= NOT(clk);
+
+    stackPointerMux : Mux1B PORT MAP(
+        notClk, clk, instruction(3), stackRegClk
+    );
 
     ---------------StackPointer -----------------------------
-    StackPointerOutput <= StackPointerIn;
+    StackPointerOutput <= memoryAddress;
 
     StackPointer : stackReg PORT MAP(
-        clk, MemorySignals(3), rst, StackPointerTemp, StackPointerIn
+        notClk, MemorySignals(3), rst, StackPointerTemp, StackPointerIn
     );
     changeSp : IncDecALU GENERIC MAP(32) PORT MAP(MemorySignals(3), MemorySignals(2), StackPointerIn, "00000000000000000000000000000010", StackPointerTemp);
     ---------------increment -----------------------------
@@ -162,21 +179,21 @@ BEGIN
     );
     ---------------Address -----------------------------
 
-    incrementSpWithValue : Mux2 GENERIC MAP(
-        32) PORT MAP(--stopflag
-        StackPointerPlus2, StackPointerPlus4, MemorySignals(0), incrementSpWithValueOut
-    );
-    pickSpOrSpUpdated : Mux2 GENERIC MAP(
-        32) PORT MAP(--ask seif 
-        StackPointerOut, incrementSpWithValueOut, MemorySignals(0), SpOrUpdatedSpOut
-    );
+    -- incrementSpWithValue : Mux2 GENERIC MAP(
+    --     32) PORT MAP(--stopflag
+    --     StackPointerPlus2, StackPointerPlus4, MemorySignals(0), incrementSpWithValueOut
+    -- );
+    -- pickSpOrSpUpdated : Mux2 GENERIC MAP(
+    --     32) PORT MAP(--ask seif 
+    --     StackPointerIn, incrementSpWithValueOut, MemorySignals(0), SpOrUpdatedSpOut
+    -- );
     RegOrStackPointer : Mux2 GENERIC MAP(
         32) PORT MAP(
-        reg1Value, SpOrUpdatedSpOut, instruction(4), RegOrStackOut
+        reg1Value, StackPointerIn, instruction(4), RegOrStackOut
     );
     memoryAddressMux : Mux2 GENERIC MAP(
         32) PORT MAP(
-        SpOrUpdatedSpOut, immedate, instruction(0), memoryAddress
+        RegOrStackOut, immedate, instruction(0), memoryAddress
     );
     ---------------MemoryValue -----------------------------
     incrementPc : FullAdder GENERIC MAP(

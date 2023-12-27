@@ -230,7 +230,23 @@ ARCHITECTURE ArchProcessor OF Processor IS
     SIGNAL flagRegSelector : STD_LOGIC := '0';
     SIGNAL ALUFlagOut : STD_LOGIC_VECTOR(3 DOWNTO 0);
     SIGNAL MemoryFlagOut : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL decodeReg1Num : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL decodeReg2Num : STD_LOGIC_VECTOR(2 DOWNTO 0);
+
+    -- hazard detection outputs
+    SIGNAL ForwordEnable1 : STD_LOGIC;
+    SIGNAL ForwordFrom1 : STD_LOGIC;
+    SIGNAL ForwordAluSelector1 : STD_LOGIC_VECTOR (1 DOWNTO 0);
+    SIGNAL ForwordMemoryEnable1 : STD_LOGIC;
+    SIGNAL ForwordEnable2 : STD_LOGIC;
+    SIGNAL ForwordFrom2 : STD_LOGIC;
+    SIGNAL ForwordAluSelector2 : STD_LOGIC_VECTOR (1 DOWNTO 0);
+    SIGNAL ForwordMemoryEnable2 : STD_LOGIC;
     SIGNAL aluEnable : std_logic;
+
+    -- forward unit output
+    SIGNAL ALUSrc1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL ALUSrc2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     SIGNAL IF_ID_input : STD_LOGIC_VECTOR(64 DOWNTO 0) := (OTHERS => '0');
     SIGNAL IF_ID_output : STD_LOGIC_VECTOR(64 DOWNTO 0) := (OTHERS => '0');
@@ -330,12 +346,12 @@ BEGIN
         register4,
         register5,
         register6,
-        register7,  
-        ID_EX_input(168 downto 166),
-        ID_EX_input(171 downto 169)
+        register7,
+        ID_EX_input(168 DOWNTO 166),
+        ID_EX_input(171 DOWNTO 169)
     );
-    decodeReg1Num <= ID_EX_output(168 downto 166);
-    decodeReg2Num <= ID_EX_output(171 downto 169);
+    decodeReg1Num <= ID_EX_output(168 DOWNTO 166);
+    decodeReg2Num <= ID_EX_output(171 DOWNTO 169);
 
     ID_EX_input(117) <= jmpAndJz AND (NOT IF_ID_output(17) OR EX_MEM_input(190));
     -- forward instruction
@@ -354,10 +370,9 @@ BEGIN
     );
 
     ----------------- Execute ----------------------------
-
-    aluEnable <= '0' WHEN ID_EX_output(97) = '1' and ID_EX_output(116) = '1' and ID_EX_output(112 downto 109) = "0001"
-    else
-    ID_EX_output(116);
+    aluEnable <= '0' WHEN ID_EX_output(97) = '1' AND ID_EX_output(116) = '1' AND ID_EX_output(112 DOWNTO 109) = "0001"
+        ELSE
+        ID_EX_output(116);
 
     Executing : Execute PORT MAP(
         clock,
@@ -403,12 +418,12 @@ BEGIN
 
     -- forward pc
     EX_MEM_input(188 DOWNTO 157) <= ID_EX_output(165 DOWNTO 134);
-    
+
     -- forward reg1Num
-    EX_MEM_input(196 downto 194) <= ID_EX_output(168 downto 166);
+    EX_MEM_input(196 DOWNTO 194) <= ID_EX_output(168 DOWNTO 166);
 
     -- forward reg2Num
-    EX_MEM_input(199 downto 197) <= ID_EX_output(171 downto 169);
+    EX_MEM_input(199 DOWNTO 197) <= ID_EX_output(171 DOWNTO 169);
 
     -- 31:0 src1,      63:32 src2,   95:64 ALU output,
     -- 127:96 immediate(sign extended),
@@ -461,10 +476,10 @@ BEGIN
     MEM_WB_input(211 DOWNTO 180) <= EX_MEM_output(188 DOWNTO 157);
 
     -- forward reg1Num
-    MEM_WB_input(214 downto 212) <= EX_MEM_output(196 downto 194);
+    MEM_WB_input(214 DOWNTO 212) <= EX_MEM_output(196 DOWNTO 194);
 
     -- forward reg2Num
-    MEM_WB_input(217 downto 215) <= EX_MEM_output(199 downto 197);
+    MEM_WB_input(217 DOWNTO 215) <= EX_MEM_output(199 DOWNTO 197);
 
     -- 31:0 src1,   63:32 src2,     95:64 mem,      127:96 alu,
     -- 159:128 immediate,    163:160 WB,       179:164 instruction,
@@ -492,17 +507,15 @@ BEGIN
         writeBack2DataSig,
         memoryPcSig);
 
-
-
     ----------------- HazardDetection unit ----------------------------
     HazardDetectionUnitR1 : HazardDetectionUnit PORT MAP(
-        EX_MEM_output(156 downto 141),
-        MEM_WB_output(179 downto 164),
+        EX_MEM_output(156 DOWNTO 141),
+        MEM_WB_output(179 DOWNTO 164),
         decodeReg1Num,
-        EX_MEM_output(196 downto 194),
-        EX_MEM_output(199 downto 197),
-        MEM_WB_output(214 downto 212),
-        MEM_WB_output(217 downto 215),
+        EX_MEM_output(196 DOWNTO 194),
+        EX_MEM_output(199 DOWNTO 197),
+        MEM_WB_output(214 DOWNTO 212),
+        MEM_WB_output(217 DOWNTO 215),
         ForwordEnable1,
         ForwordFrom1,
         ForwordAluSelector1,
@@ -510,13 +523,13 @@ BEGIN
     );
 
     HazardDetectionUnitR2 : HazardDetectionUnit PORT MAP(
-        EX_MEM_output(156 downto 141),
-        MEM_WB_output(179 downto 164),
+        EX_MEM_output(156 DOWNTO 141),
+        MEM_WB_output(179 DOWNTO 164),
         decodeReg2Num,
-        EX_MEM_output(196 downto 194),
-        EX_MEM_output(199 downto 197),
-        MEM_WB_output(214 downto 212),
-        MEM_WB_output(217 downto 215),
+        EX_MEM_output(196 DOWNTO 194),
+        EX_MEM_output(199 DOWNTO 197),
+        MEM_WB_output(214 DOWNTO 212),
+        MEM_WB_output(217 DOWNTO 215),
         ForwordEnable2,
         ForwordFrom2,
         ForwordAluSelector2,

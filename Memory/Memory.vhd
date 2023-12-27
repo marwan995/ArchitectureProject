@@ -21,7 +21,8 @@ ENTITY Memory IS
 
         memoryOut : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
         protectionFlag : OUT STD_LOGIC;
-        stackPointerOutput : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        stackPointerOutput : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        rstData : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
 
     );
 END Memory;
@@ -84,7 +85,9 @@ ARCHITECTURE ArchMemory OF Memory IS
             enable : IN STD_LOGIC;
             address : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
             datain : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            dataout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0));
+            dataout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            rstData : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        );
     END COMPONENT dataMemory;
     COMPONENT protectedMemory IS
         PORT (
@@ -212,7 +215,7 @@ BEGIN
     dataMemoryWR <= MemorySignals(6) AND isProtected;
 
     data : dataMemory PORT MAP(
-        clk, dataMemoryWR, dataMemoryEnable, memoryAddress(11 DOWNTO 0), memoryValueOut, memoryDataOut
+        clk, dataMemoryWR, dataMemoryEnable, memoryAddress(11 DOWNTO 0), memoryValueOut, memoryDataOut, rstData
     );
     protectedMemoryDataIn <= NOT instruction(3);
 

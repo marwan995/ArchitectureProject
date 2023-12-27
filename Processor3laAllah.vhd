@@ -54,7 +54,8 @@ ARCHITECTURE ArchProcessor OF Processor IS
             memoryPc : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             stackPc : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             assemblerPC : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            pcOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+            pcOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            rstInData : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT Fetch;
     COMPONENT Decode IS
@@ -130,7 +131,8 @@ ARCHITECTURE ArchProcessor OF Processor IS
             memoryOut : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
             protectionFlag : OUT STD_LOGIC;
 
-            stackPointerOutput : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+            stackPointerOutput : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            rstData : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
 
         );
     END COMPONENT Memory;
@@ -193,6 +195,7 @@ ARCHITECTURE ArchProcessor OF Processor IS
 
     SIGNAL MEM_WB_input : STD_LOGIC_VECTOR(211 DOWNTO 0) := (OTHERS => '0');
     SIGNAL MEM_WB_output : STD_LOGIC_VECTOR(211 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL rstSignal : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     -- WR outputs
     SIGNAL writeBack1EnableSig : STD_LOGIC;
@@ -239,7 +242,8 @@ BEGIN
         memoryPcSig,
         (OTHERS => '0'),
         assemblerPC,
-        IF_ID_input(64 DOWNTO 33)
+        IF_ID_input(64 DOWNTO 33),
+        rstSignal
     );
 
     -- 15 : 0  immidate ,  31 :16 instruction , 32 freeze(imm) , 64 :33 PC 
@@ -280,7 +284,7 @@ BEGIN
         register6,
         register7
     );
-    ID_EX_input(117) <= jmpAndJz and (not IF_ID_output(17) or EX_MEM_input(190));
+    ID_EX_input(117) <= jmpAndJz AND (NOT IF_ID_output(17) OR EX_MEM_input(190));
     -- forward instruction
     ID_EX_input(133 DOWNTO 118) <= IF_ID_output(31 DOWNTO 16);
 
@@ -366,7 +370,8 @@ BEGIN
         outPort,
         MEM_WB_input(95 DOWNTO 64),
         protectFlag,
-        stackPointer
+        stackPointer,
+        rstSignal--data
     );
 
     -- forward src1

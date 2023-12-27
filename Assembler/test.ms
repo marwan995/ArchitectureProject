@@ -1,12 +1,28 @@
-ldm r0 12
-ldm r1 12
+in r1
+in r2
+in r3
+in R4
+nop
+addi r5 r3 2
+add r4 r1 r4
 nop
 nop
-sub r5 r0 r1
-jz r0
+sub r6 r5 r4
 nop
 nop
+and r6 r7 r6
+or r1 r2 r1
+rcl r2 2
 nop
 nop
-add r5 r6 r7
-swap r0 r1
+rcr r2 3
+nop
+nop
+swap r2 r5
+nop
+nop
+add r2 r5 r2
+nop
+nop
+bitset r2 2
+xor r1 r1 r1

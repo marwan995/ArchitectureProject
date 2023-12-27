@@ -86,7 +86,10 @@ ARCHITECTURE ArchProcessor OF Processor IS
             register4 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             register5 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             register6 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+            register7 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+            reg1NumOut : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            reg2NumOut : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
 
         );
     END COMPONENT Decode;
@@ -162,6 +165,49 @@ ARCHITECTURE ArchProcessor OF Processor IS
             output : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
         );
     END COMPONENT Mux2;
+    COMPONENT ForwardUnit IS
+        PORT (
+            regSrc2 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+            aluRegAlu : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            aluRegImmedate : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            aluRegSrc1 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            aluRegSrc2 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+            MemoryRegALu : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            MemoryRegImmedate : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            MemoryRegSrc1 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            MemoryRegSrc2 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            MemoryRegMemory : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+            forwardAluSelector : IN STD_LOGIC_VECTOR (1 DOWNTO 0);
+            forwardMemoryEnable : IN STD_LOGIC;
+            forwardEnable : IN STD_LOGIC;
+            forwardFrom : IN STD_LOGIC;
+
+            forwardOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        );
+    END COMPONENT ForwardUnit;
+    COMPONENT HazardDetectionUnit IS
+        PORT (
+            --instruction
+            instruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+            --Regs 
+            reg : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            aluReg1 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            aluReg2 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            memoryReg1 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            memoryReg2 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            --Forword
+            ForwordEnable : OUT STD_LOGIC;
+            ForwordFrom : OUT STD_LOGIC;
+            --alu
+            ForwordAluSelector : OUT STD_LOGIC_VECTOR (1 DOWNTO 0);
+
+            --memory
+            ForwordMemoryEnable : OUT STD_LOGIC
+        );
+    END COMPONENT HazardDetectionUnit;
 
     COMPONENT PipeLineReg IS
         GENERIC (n : INTEGER := 32);
@@ -177,18 +223,34 @@ ARCHITECTURE ArchProcessor OF Processor IS
     SIGNAL flagRegSelector : STD_LOGIC := '0';
     SIGNAL ALUFlagOut : STD_LOGIC_VECTOR(3 DOWNTO 0);
     SIGNAL MemoryFlagOut : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL decodeReg1Num : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL decodeReg2Num : STD_LOGIC_VECTOR(2 DOWNTO 0);
+
+    -- hazard detection outputs
+    SIGNAL ForwordEnable1 :  STD_LOGIC;
+    SIGNAL ForwordFrom1 :  STD_LOGIC;
+    SIGNAL ForwordAluSelector1 :  STD_LOGIC_VECTOR (1 DOWNTO 0);
+    SIGNAL ForwordMemoryEnable1 : STD_LOGIC;
+    SIGNAL ForwordEnable2 :  STD_LOGIC;
+    SIGNAL ForwordFrom2 :  STD_LOGIC;
+    SIGNAL ForwordAluSelector2 :  STD_LOGIC_VECTOR (1 DOWNTO 0);
+    SIGNAL ForwordMemoryEnable2 : STD_LOGIC;
+
+    -- forward unit output
+    SIGNAL ALUSrc1 :  STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL ALUSrc2 :  STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     SIGNAL IF_ID_input : STD_LOGIC_VECTOR(64 DOWNTO 0) := (OTHERS => '0');
     SIGNAL IF_ID_output : STD_LOGIC_VECTOR(64 DOWNTO 0) := (OTHERS => '0');
 
-    SIGNAL ID_EX_input : STD_LOGIC_VECTOR(165 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL ID_EX_output : STD_LOGIC_VECTOR(165 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL ID_EX_input : STD_LOGIC_VECTOR(171 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL ID_EX_output : STD_LOGIC_VECTOR(171 DOWNTO 0) := (OTHERS => '0');
 
-    SIGNAL EX_MEM_input : STD_LOGIC_VECTOR(193 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL EX_MEM_output : STD_LOGIC_VECTOR(193 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL EX_MEM_input : STD_LOGIC_VECTOR(199 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL EX_MEM_output : STD_LOGIC_VECTOR(199 DOWNTO 0) := (OTHERS => '0');
 
-    SIGNAL MEM_WB_input : STD_LOGIC_VECTOR(211 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL MEM_WB_output : STD_LOGIC_VECTOR(211 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL MEM_WB_input : STD_LOGIC_VECTOR(217 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL MEM_WB_output : STD_LOGIC_VECTOR(217 DOWNTO 0) := (OTHERS => '0');
 
     -- WR outputs
     SIGNAL writeBack1EnableSig : STD_LOGIC;
@@ -204,7 +266,7 @@ ARCHITECTURE ArchProcessor OF Processor IS
 BEGIN
     PROCESS
     BEGIN
-        WAIT FOR 50 ns;
+        WAIT FOR 50 ps;
         clock <= NOT clock;
     END PROCESS;
 
@@ -274,9 +336,14 @@ BEGIN
         register4,
         register5,
         register6,
-        register7
+        register7,  
+        ID_EX_input(168 downto 166),
+        ID_EX_input(171 downto 169)
     );
-    ID_EX_input(117) <= jmpAndJz and (not IF_ID_output(17) or EX_MEM_input(190));
+    decodeReg1Num <= ID_EX_input(168 downto 166);
+    decodeReg2Num <= ID_EX_input(171 downto 169);
+
+    ID_EX_input(117) <= jmpAndJz AND (NOT IF_ID_output(17) OR EX_MEM_input(190));
     -- forward instruction
     ID_EX_input(133 DOWNTO 118) <= IF_ID_output(31 DOWNTO 16);
 
@@ -286,8 +353,9 @@ BEGIN
     -- 31:0 src1,       63:32 src2,     95:64 immediate(sign extended),
     -- 99:96 WB,       108:100 MEM,    116:109 ALU,    117 jmpFlag
     -- 133:118 instruction,      165:134 pc
+    -- 168:166 reg1Num, 171:169 reg2Num
     ID_EX : pipeLineReg GENERIC MAP(
-        166) PORT MAP(
+        172) PORT MAP(
         clock, rst, ID_EX_input, ID_EX_output
     );
 
@@ -302,8 +370,8 @@ BEGIN
         ID_EX_output(113),
         EX_MEM_output(193 DOWNTO 190),
         ID_EX_output(112 DOWNTO 109),
-        ID_EX_output(31 DOWNTO 0),
-        ID_EX_output(63 DOWNTO 32),
+        ALUSrc1,
+        ALUSrc2,
         ID_EX_output(95 DOWNTO 64),
 
         ALUFlagOut,
@@ -337,13 +405,20 @@ BEGIN
 
     -- forward pc
     EX_MEM_input(188 DOWNTO 157) <= ID_EX_output(165 DOWNTO 134);
+    
+    -- forward reg1Num
+    EX_MEM_input(196 downto 194) <= ID_EX_output(168 downto 166);
+
+    -- forward reg2Num
+    EX_MEM_input(199 downto 197) <= ID_EX_output(171 downto 169);
 
     -- 31:0 src1,      63:32 src2,   95:64 ALU output,
     -- 127:96 immediate(sign extended),
     -- 131:128 WB,     140:132 MEM,    ,    156:141 instruction,
-    -- 188:157 pc      189 stop flag  ,  193:190 flag regesiter 
+    -- 188:157 pc      189 stop flag  ,  193:190 flag regesiter,
+    -- 196:194 reg1Num, 199:197 reg2Num
     EX_MEM : pipeLineReg GENERIC MAP(
-        194) PORT MAP(
+        200) PORT MAP(
         clock, rst, EX_MEM_input, EX_MEM_output
     );
 
@@ -384,11 +459,19 @@ BEGIN
 
     -- forward pc
     MEM_WB_input(211 DOWNTO 180) <= EX_MEM_output(188 DOWNTO 157);
+
+    -- forward reg1Num
+    MEM_WB_input(214 downto 212) <= EX_MEM_output(196 downto 194);
+
+    -- forward reg2Num
+    MEM_WB_input(217 downto 215) <= EX_MEM_output(199 downto 197);
+
     -- 31:0 src1,   63:32 src2,     95:64 mem,      127:96 alu,
     -- 159:128 immediate,    163:160 WB,       179:164 instruction,
     -- 211:180 pc
+    -- 214:212 reg1Num, 217:215 reg2Num
     MEM_WB : pipeLineReg GENERIC MAP(
-        212) PORT MAP(
+        218) PORT MAP(
         clock, rst, MEM_WB_input, MEM_WB_output
     );
 
@@ -408,4 +491,79 @@ BEGIN
         writeBack1DataSig,
         writeBack2DataSig,
         memoryPcSig);
+
+
+
+    ----------------- HazardDetection unit ----------------------------
+    HazardDetectionUnitR1 : HazardDetectionUnit PORT MAP(
+        IF_ID_output(31 DOWNTO 16),
+        decodeReg1Num,
+        ID_EX_output(168 downto 166),
+        ID_EX_output(171 downto 169),
+        EX_MEM_output(196 downto 194),
+        EX_MEM_output(199 downto 197),
+        ForwordEnable1,
+        ForwordFrom1,
+        ForwordAluSelector1,
+        ForwordMemoryEnable1
+    );
+
+    HazardDetectionUnitR2 : HazardDetectionUnit PORT MAP(
+        IF_ID_output(31 DOWNTO 16),
+        decodeReg2Num,
+        ID_EX_output(168 downto 166),
+        ID_EX_output(171 downto 169),
+        EX_MEM_output(196 downto 194),
+        EX_MEM_output(199 downto 197),
+        ForwordEnable2,
+        ForwordFrom2,
+        ForwordAluSelector2,
+        ForwordMemoryEnable2
+    );
+
+    ----------------- Foward unit ----------------------------
+    ForwardUnitTest1 : ForwardUnit PORT MAP(
+        ID_EX_output(31 DOWNTO 0),
+        EX_MEM_output(95 DOWNTO 64),
+        EX_MEM_output(127 DOWNTO 96),
+        EX_MEM_output(31 DOWNTO 0),
+        EX_MEM_output(63 DOWNTO 32),
+
+        --memory
+        MEM_WB_output(127 DOWNTO 96),
+        MEM_WB_output(159 DOWNTO 128),
+        MEM_WB_output(31 DOWNTO 0),
+        MEM_WB_output(63 DOWNTO 32),
+        MEM_WB_output(95 DOWNTO 64),
+
+        ForwordAluSelector1,
+        ForwordMemoryEnable1,
+        ForwordEnable1,
+        ForwordFrom1,
+
+        ALUSrc1
+    );
+
+    ForwardUnitTest2 : ForwardUnit PORT MAP(
+        ID_EX_output(31 DOWNTO 0),
+        EX_MEM_output(95 DOWNTO 64),
+        EX_MEM_output(127 DOWNTO 96),
+        EX_MEM_output(31 DOWNTO 0),
+        EX_MEM_output(63 DOWNTO 32),
+
+        --memory
+        MEM_WB_output(127 DOWNTO 96),
+        MEM_WB_output(159 DOWNTO 128),
+        MEM_WB_output(31 DOWNTO 0),
+        MEM_WB_output(63 DOWNTO 32),
+        MEM_WB_output(95 DOWNTO 64),
+
+        ForwordAluSelector1,
+        ForwordMemoryEnable1,
+        ForwordEnable1,
+        ForwordFrom1,
+
+        ALUSrc2
+    );
+
 END ARCHITECTURE;

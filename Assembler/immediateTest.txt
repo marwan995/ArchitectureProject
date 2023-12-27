@@ -1,5 +1,5 @@
-cmp r0 r1
-LDM r0 5
+ldm r0 0
+ldm r2 ah
 nop
 nop
-cmp r0 r1
+cmp r0 r2
